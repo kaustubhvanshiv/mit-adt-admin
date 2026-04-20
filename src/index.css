@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-bg: #f8fafc;
+  --color-navy: #721c8a; /* MIT-ADT Purple */
+  --color-navy-light: #8e24aa;
+  --color-accent: #f39200; /* MIT-ADT Orange */
+  --color-border: #e2e8f0;
+  --color-text-main: #334155;
+  --color-text-muted: #64748b;
+  
+  --color-mit-purple: #721c8a;
+  --color-mit-orange: #f39200;
+  --color-mit-cyan: #00d1d1;
+  --color-mit-green: #00a651;
+  --color-mit-red: #ed1c24;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text-main font-sans antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white border border-border rounded-lg p-6 shadow-sm;
+  }
+  
+  .card-title {
+    @apply text-base font-semibold mb-5 flex items-center gap-2 text-navy;
+  }
+  
+  .label {
+    @apply text-[12px] font-semibold text-text-muted uppercase tracking-wider;
+  }
+  
+  .input {
+    @apply px-3 py-2.5 border border-border rounded-md font-mono text-[13px] w-full bg-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all;
+  }
+  
+  .btn {
+    @apply bg-navy text-white px-5 py-2.5 rounded-md font-semibold text-sm cursor-pointer hover:bg-navy-light transition-colors disabled:opacity-50;
+  }
+}

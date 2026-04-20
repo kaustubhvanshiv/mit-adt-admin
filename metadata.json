@@ -1,0 +1,6 @@
+{
+  "name": "ADT University Admin Panel (Simulation)",
+  "description": "A cybersecurity lab simulation for testing SSRF vulnerabilities in a university admin system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
