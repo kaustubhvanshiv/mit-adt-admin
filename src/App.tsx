@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import mitLogo from '../images/mit_adt_logo.png';
 import { 
   Shield, 
   Search, 
@@ -19,12 +20,17 @@ import {
   FileText,
   History,
   Settings,
-  Activity
+  Activity,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Youtube
 } from 'lucide-react';
 
 // --- Types ---
 
-type Page = 'landing' | 'admin' | 'submission';
+type Page = 'landing' | 'admin' | 'submission' | 'about' | 'academics';
 
 interface SolvedState {
   ssrf: boolean;
@@ -38,55 +44,116 @@ const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void,
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
       {/* Colorful Top Accent Bar */}
-      <div className="h-1.5 flex w-full">
+      <div className="h-2 flex w-full">
         <div className="h-full w-1/4 bg-mit-red" />
         <div className="h-full w-1/4 bg-mit-orange" />
         <div className="h-full w-1/4 bg-mit-green" />
         <div className="h-full w-1/4 bg-mit-cyan" />
       </div>
-      
-      <header className="h-20 bg-mit-purple flex items-center justify-between px-6 text-white border-b border-white/10 shrink-0 shadow-lg">
-        <div className="flex items-center gap-4 cursor-pointer" onClick={() => onNavigate('landing')}>
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 shadow-inner">
-            <Shield className="text-mit-purple w-8 h-8" />
+
+      {/* Main Header */}
+      <header className="bg-mit-purple text-white px-8 py-0">
+        <div className="max-w-7xl mx-auto">
+          {/* Top Row: Logo, Branding, and Top Right Links */}
+          <div className="flex items-center justify-between mb-0">
+            {/* Logo Only */}
+            <div className="flex items-center cursor-pointer" onClick={() => onNavigate('landing')}>
+              <div className="w-64 h-30 flex items-center justify-center flex-shrink-0 py-5">
+                <img 
+                  src={mitLogo}
+                  alt="MIT ADT Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Top Right: Quick Links and Buttons */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex gap-1.5">
+                <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">VC-SMS</button>
+                <button className="bg-mit-orange text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">ODL / OL</button>
+                <button className="bg-mit-green text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Login</button>
+                <button className="bg-mit-red text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Life @ Campus</button>
+                <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Contact Us</button>
+              </div>
+              {/* Secondary Links */}
+              <div className="text-[12px] flex gap-2 text-white/80">
+                <button className="hover:text-white transition">Careers</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">Alumni</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">Happenings</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">Exams</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">International</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">NAAC</button>
+                <span className="text-white/50">|</span>
+                <button className="hover:text-white transition">Disclosures</button>
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="font-bold text-lg leading-none tracking-tight">MIT-ADT UNIVERSITY</div>
-            <div className="text-[10px] text-white/70 uppercase tracking-[0.2em] mt-1">Pune, India</div>
+
+          {/* Divider Line */}
+          <div className="h-px bg-white/20 my-0"></div>
+
+          {/* Social Icons and Main Navigation */}
+          <div className="flex items-center justify-between">
+            {/* Main Navigation */}
+            <nav className="flex gap-8 items-center">
+              <button 
+                onClick={() => onNavigate('landing')}
+                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'landing' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => onNavigate('about')}
+                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'about' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
+              >
+                About Us
+              </button>
+              <button 
+                onClick={() => onNavigate('academics')}
+                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'academics' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
+              >
+                Academics
+              </button>
+              <button 
+                onClick={() => onNavigate('admin')}
+                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'admin' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
+              >
+                System Console
+              </button>
+              <button 
+                onClick={() => onNavigate('submission')}
+                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'submission' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
+              >
+                Flag Submission
+              </button>
+            </nav>
+
+            {/* Social Media Icons */}
+            <div className="flex gap-3 items-center">
+              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
+                <Linkedin className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
+                <Youtube className="w-5 h-5" />
+              </a>
+              <Search className="w-6 h-6 text-white cursor-pointer hover:text-mit-orange transition" />
+            </div>
           </div>
-        </div>
-        
-        <nav className="hidden lg:flex gap-8 items-center">
-          <button 
-            onClick={() => onNavigate('landing')}
-            className={`text-xs font-bold uppercase tracking-widest transition-all hover:text-mit-orange ${currentPage === 'landing' ? 'text-mit-orange' : 'text-white'}`}
-          >
-            Home
-          </button>
-          <button className="text-xs font-bold uppercase tracking-widest text-white hover:text-mit-orange transition-all">About Us</button>
-          <button className="text-xs font-bold uppercase tracking-widest text-white hover:text-mit-orange transition-all">Academics</button>
-          <button 
-            onClick={() => onNavigate('admin')}
-            className={`text-xs font-bold uppercase tracking-widest transition-all hover:text-mit-orange ${currentPage === 'admin' ? 'text-mit-orange' : 'text-white'}`}
-          >
-            System Console
-          </button>
-          <button 
-            onClick={() => onNavigate('submission')}
-            className={`text-xs font-bold uppercase tracking-widest transition-all hover:text-mit-orange ${currentPage === 'submission' ? 'text-mit-orange' : 'text-white'}`}
-          >
-            Flag Submission
-          </button>
-          
-          <div className="flex gap-2 ml-4">
-            <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">VC-SMS</button>
-            <button className="bg-mit-orange text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Login</button>
-            <button className="bg-mit-green text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Contact</button>
-          </div>
-        </nav>
-        
-        <div className="lg:hidden">
-          <Menu className="w-6 h-6" />
         </div>
       </header>
     </div>
@@ -344,6 +411,341 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
   );
 };
 
+const AboutPage = () => {
+  return (
+    <div className="p-10 max-w-4xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="card mb-8 border-2 border-mit-purple/20"
+      >
+        <div className="mb-8">
+          <h1 className="text-5xl font-bold text-mit-purple mb-4">About MIT ADT University</h1>
+          <p className="text-lg text-slate-600 leading-relaxed">
+            MIT Art, Design and Technology University (MIT ADT), located in Pune, Maharashtra, is a multidisciplinary private university known for its focus on innovation, creativity, and industry-oriented education.
+          </p>
+        </div>
+      </motion.div>
+
+      <div className="space-y-8">
+        {[
+          {
+            title: "Overview",
+            content: "Established as part of the MIT Group of Institutions, MIT ADT bridges the gap between academic learning and real-world application by integrating practical exposure into its curriculum. The university aims to foster innovation and creativity while maintaining academic excellence.",
+            icon: Globe,
+            color: 'text-mit-cyan'
+          },
+          {
+            title: "Academic Excellence",
+            content: "MIT ADT has built a strong reputation for combining technology with design, arts, and management. It offers a wide range of undergraduate, postgraduate, and doctoral programs across multiple disciplines including engineering, design, management, fine arts, and film & media. The academic structure emphasizes experiential learning, encouraging students to participate in projects, research, and industry collaborations through workshops, labs, and interdisciplinary programs.",
+            icon: Shield,
+            color: 'text-mit-purple'
+          },
+          {
+            title: "Campus & Environment",
+            content: "The campus in Pune provides a modern and dynamic learning environment with well-equipped laboratories, design studios, and collaborative spaces. Students are encouraged to engage in extracurricular activities, cultural events, and entrepreneurship initiatives, contributing to their overall personal and professional growth.",
+            icon: Server,
+            color: 'text-mit-orange'
+          },
+          {
+            title: "Vision & Development",
+            content: "MIT ADT University focuses on holistic development, ensuring that students not only gain academic knowledge but also build leadership, communication, and problem-solving abilities. With a strong emphasis on industry readiness, the university prepares students to adapt to evolving global challenges and career opportunities through its commitment to quality education and innovation.",
+            icon: CheckCircle2,
+            color: 'text-mit-green'
+          }
+        ].map((section, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
+            className="card hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                <section.icon className={`${section.color} w-6 h-6`} />
+              </div>
+              <div className="grow">
+                <h2 className="text-xl font-bold text-slate-800 mb-3">{section.title}</h2>
+                <p className="text-slate-600 leading-relaxed">{section.content}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="mt-12 p-8 bg-gradient-to-r from-mit-purple/10 to-mit-orange/10 rounded-lg border border-mit-purple/20"
+      >
+        <h3 className="text-2xl font-bold text-mit-purple mb-4">Ready to Join Us?</h3>
+        <p className="text-slate-600 mb-6 leading-relaxed">
+          MIT ADT University continues to nurture future-ready professionals equipped with the skills required in today's competitive world. Whether you're interested in pursuing your passion for technology, design, or management, we have the right program for you.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <button className="bg-mit-purple text-white px-6 py-2 rounded font-semibold text-sm hover:brightness-110 transition-all shadow-md">
+            Admissions
+          </button>
+          <button className="border-2 border-mit-orange text-mit-orange px-6 py-2 rounded font-semibold text-sm hover:bg-mit-orange/5 transition-all">
+            Learn More
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+const AcademicsPage = () => {
+  const [selectedFaculty, setSelectedFaculty] = useState<string>('design');
+
+  const faculties = [
+    {
+      id: 'design',
+      name: 'Faculty of Design',
+      description: "MAER's MIT Institute of Design started its operations in August 2006, guided by the leading minds in Indian design education, with a plan to develop its identity as a research & training institution of highest international quality.",
+      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=500',
+      programs: [
+        { name: 'Institute of Design (IOD)', icon: '🎨' }
+      ],
+      details: {
+        overview: "The Faculty of Design focuses on combining technology with creative thinking to develop innovative solutions for real-world problems.",
+        advantages: [
+          "Hands-on design studio experience",
+          "Industry collaboration and internships",
+          "Research opportunities in emerging design fields",
+          "International exchange programs",
+          "Mentorship from renowned design professionals"
+        ]
+      }
+    },
+    {
+      id: 'art',
+      name: 'Faculty of Art, Fine Art and Performing Art',
+      description: "The faculty of Art, Fine Art & Applied Art was formulated with an aim to form an amalgamation of various forms of art. We have meticulously chosen programs from a wide spectrum of Art such as music, dance, filmmaking and television techniques.",
+      image: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&q=80&w=500',
+      programs: [
+        { name: 'Vishwashanti Sangeet Kala Academy (VSKA)', icon: '🎵' },
+        { name: 'School of Fine Arts and Applied Arts (SOFA)', icon: '🖼️' }
+      ],
+      details: {
+        overview: "Explore various forms of artistic expression including music, dance, visual arts, and film production.",
+        advantages: [
+          "State-of-the-art performance and recording facilities",
+          "Guidance from internationally acclaimed artists",
+          "Regular exhibitions and performances",
+          "Industry connections in media and entertainment",
+          "Opportunities for cultural exchange"
+        ]
+      }
+    },
+    {
+      id: 'engineering',
+      name: 'Faculty of Engineering',
+      description: "Combining cutting-edge technology with practical application, our engineering programs prepare students to solve real-world challenges through innovation and critical thinking.",
+      image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&q=80&w=500',
+      programs: [
+        { name: 'School of Computer Science & Engineering', icon: '💻' },
+        { name: 'School of Mechanical Engineering', icon: '⚙️' }
+      ],
+      details: {
+        overview: "Advanced engineering education with focus on emerging technologies and sustainable solutions.",
+        advantages: [
+          "Advanced laboratories and maker spaces",
+          "Industry partnerships with leading companies",
+          "Research opportunities in AI, IoT, and robotics",
+          "Global internship programs",
+          "Placement support with top tech companies"
+        ]
+      }
+    },
+    {
+      id: 'management',
+      name: 'Faculty of Management',
+      description: "Developing future leaders through rigorous management education that combines theoretical knowledge with practical business acumen.",
+      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=500',
+      programs: [
+        { name: 'School of Business Administration', icon: '📊' },
+        { name: 'School of Entrepreneurship', icon: '🚀' }
+      ],
+      details: {
+        overview: "Comprehensive management education preparing students for corporate leadership and entrepreneurship.",
+        advantages: [
+          "Case study-based learning methodology",
+          "Executive mentorship programs",
+          "Business incubation support",
+          "International business exposure",
+          "Strong alumni network in leading companies"
+        ]
+      }
+    }
+  ];
+
+  const currentFaculty = faculties.find(f => f.id === selectedFaculty) || faculties[0];
+
+  return (
+    <div className="bg-white min-h-screen">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-mit-purple via-mit-orange to-mit-orange relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <img 
+            src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80" 
+            alt="background" 
+            className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div className="relative px-8 py-12 text-white">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">Academics</h1>
+          <p className="text-white/80 text-lg max-w-2xl">Explore our diverse range of programs across multiple disciplines</p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-8 p-8 max-w-7xl mx-auto">
+        {/* Sidebar */}
+        <aside className="lg:w-72 shrink-0">
+          <div className="sticky top-8">
+            <div className="bg-mit-purple text-white px-6 py-4 rounded-lg mb-4">
+              <h3 className="font-bold text-lg">Programs</h3>
+            </div>
+            
+            <div className="space-y-2">
+              {faculties.map((faculty) => (
+                <button
+                  key={faculty.id}
+                  onClick={() => setSelectedFaculty(faculty.id)}
+                  className={`w-full text-left px-6 py-4 rounded-lg font-semibold text-sm transition-all border-l-4 ${
+                    selectedFaculty === faculty.id
+                      ? 'bg-mit-purple/10 text-mit-purple border-mit-purple'
+                      : 'text-slate-700 border-transparent hover:bg-slate-50 bg-white'
+                  }`}
+                >
+                  {faculty.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <div className="flex-1">
+          <motion.div
+            key={selectedFaculty}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-8"
+          >
+            {/* Hero Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch bg-gradient-to-r from-mit-orange to-mit-orange/80 rounded-lg overflow-hidden shadow-lg">
+              {/* Image */}
+              <div className="h-full min-h-[350px] overflow-hidden">
+                <img 
+                  src={currentFaculty.image} 
+                  alt={currentFaculty.name}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="p-8 flex flex-col justify-between text-white">
+                <div>
+                  <h2 className="text-3xl font-bold mb-6">{currentFaculty.name}</h2>
+                  <p className="text-lg leading-relaxed mb-8 text-white/90">
+                    {currentFaculty.description}
+                  </p>
+                </div>
+
+                {/* Programs Box */}
+                <div className="bg-white rounded-lg p-6 text-slate-800">
+                  <div className="space-y-4">
+                    {currentFaculty.programs.map((program, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="text-2xl">{program.icon}</div>
+                        <div>
+                          <p className="font-semibold text-mit-purple">{program.name}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button className="w-full mt-6 bg-mit-orange text-white py-2.5 px-4 rounded-full font-bold hover:brightness-110 transition-all">
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Details Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Overview */}
+              <div className="card">
+                <h3 className="text-2xl font-bold text-mit-purple mb-4">Overview</h3>
+                <p className="text-slate-600 leading-relaxed">
+                  {currentFaculty.details.overview}
+                </p>
+              </div>
+
+              {/* Key Statistics */}
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Programs Offered', value: currentFaculty.programs.length },
+                  { label: 'Faculty Members', value: '50+' },
+                  { label: 'Active Students', value: '2000+' },
+                  { label: 'Industry Partners', value: '100+' }
+                ].map((stat, idx) => (
+                  <div key={idx} className="card bg-gradient-to-br from-mit-purple/10 to-mit-orange/10 border-2 border-mit-purple/20">
+                    <p className="text-3xl font-bold text-mit-purple">{stat.value}</p>
+                    <p className="text-sm text-slate-600 mt-2">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Advantages */}
+            <div className="card">
+              <h3 className="text-2xl font-bold text-mit-purple mb-8">Why Choose This Faculty?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {currentFaculty.details.advantages.map((advantage, idx) => (
+                  <div key={idx} className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-mit-orange/20 flex items-center justify-center shrink-0 mt-1">
+                      <CheckCircle2 className="w-4 h-4 text-mit-orange" />
+                    </div>
+                    <p className="text-slate-700 font-medium">{advantage}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <div className="bg-gradient-to-r from-mit-purple to-mit-orange rounded-lg p-8 text-white">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">Ready to Join?</h3>
+                  <p className="text-white/80 mb-6">
+                    Start your journey with us today. Explore career opportunities and take the first step towards your future.
+                  </p>
+                </div>
+                <div className="flex gap-4 lg:justify-end">
+                  <button className="bg-white text-mit-purple px-8 py-3 rounded-full font-bold hover:brightness-95 transition-all shadow-lg">
+                    Enquire Now
+                  </button>
+                  <button className="bg-mit-cyan text-white px-8 py-3 rounded-full font-bold hover:brightness-110 transition-all shadow-lg">
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminPanel = () => {
   const [url, setUrl] = useState('');
   const [response, setResponse] = useState<string | null>(null);
@@ -525,7 +927,7 @@ export default function App() {
     <div className="h-screen flex flex-col overflow-hidden">
       <Header onNavigate={setCurrentPage} currentPage={currentPage} />
       
-      <div className="flex grow mt-[86px] h-[calc(100vh-86px)] overflow-hidden">
+      <div className="flex grow mt-[160px] h-[calc(100vh-300px)] overflow-hidden">
         <Sidebar onNavigate={setCurrentPage} currentPage={currentPage} />
         
         <main className="grow overflow-y-auto bg-bg">
@@ -548,6 +950,26 @@ export default function App() {
                 transition={{ duration: 0.3 }}
               >
                 <LandingPage onNavigate={setCurrentPage} />
+              </motion.div>
+            ) : currentPage === 'about' ? (
+              <motion.div
+                key="about"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AboutPage />
+              </motion.div>
+            ) : currentPage === 'academics' ? (
+              <motion.div
+                key="academics"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AcademicsPage />
               </motion.div>
             ) : currentPage === 'admin' ? (
               <motion.div
