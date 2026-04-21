@@ -218,3 +218,93 @@ This project is provided for educational purposes. See LICENSE file for details.
 ---
 
 **Happy Hacking! 🎯**
+
+## 🚀 Deployment to Vercel
+
+This project is configured for easy deployment on Vercel. Follow these steps to deploy:
+
+### Prerequisites
+
+- A [Vercel account](https://vercel.com/signup)
+- Git repository with the project code
+- Environment variables ready
+
+### Deployment Steps
+
+#### Option 1: Using Vercel Dashboard (Recommended)
+
+1. **Push your code to GitHub, GitLab, or Bitbucket**
+   ```bash
+   git push origin main
+   ```
+
+2. **Go to [Vercel Dashboard](https://vercel.com/dashboard)**
+   - Click "Add New..." → "Project"
+   - Import your Git repository
+
+3. **Configure Environment Variables**
+   - In the Vercel project settings, go to "Environment Variables"
+   - Add `GEMINI_API_KEY` (if using Gemini features)
+   - Add `APP_URL` (set to your Vercel domain)
+
+4. **Deploy**
+   - Click "Deploy"
+   - Vercel will automatically build and deploy your project
+
+#### Option 2: Using Vercel CLI
+
+1. **Install Vercel CLI**
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Deploy from your project directory**
+   ```bash
+   vercel
+   ```
+
+3. **Follow the prompts**
+   - Link to your Vercel account
+   - Select or create a project
+   - Confirm settings
+
+4. **Set environment variables**
+   ```bash
+   vercel env add GEMINI_API_KEY
+   ```
+
+### Deployment Configuration
+
+The project includes a `vercel.json` configuration file that specifies:
+- Node.js runtime for the Express server
+- Build command to generate the Vite bundle
+- Routing configuration for API endpoints and static files
+
+### Post-Deployment
+
+After successful deployment:
+- Your app is available at `https://<project-name>.vercel.app`
+- API endpoints are accessible at `https://<project-name>.vercel.app/api/*`
+- Update `APP_URL` environment variable to your Vercel domain
+
+### Troubleshooting Deployment
+
+**Build fails?**
+- Check build logs in Vercel dashboard
+- Ensure all dependencies are in `package.json`
+- Verify Node.js version is 18+
+
+**Environment variables not loading?**
+- Make sure variables are added in Vercel settings
+- Redeploy after adding/modifying variables
+- Check that `.env` file is in `.gitignore`
+
+**API endpoints returning 404?**
+- Verify `server.ts` is correctly configured
+- Check routing configuration in `vercel.json`
+- Review Vercel function logs for errors
+
+---
+
+**Happy Hacking! 🎯**
+

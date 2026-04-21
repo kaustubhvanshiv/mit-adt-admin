@@ -1,0 +1,15 @@
+node_modules
+.git
+.env
+.env.local
+.DS_Store
+*.md
+!README.md
+dist
+.next
+.nuxt
+out
+build
+coverage
+.turbo
+.vercel
