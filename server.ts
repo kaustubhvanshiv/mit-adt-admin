@@ -1,5 +1,4 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
@@ -122,15 +121,18 @@ Disallow: /api/internal/config
     res.json({ status: "online", system: "ADT-University-Admin-v1.0.4" });
   });
 
-  // --- VITE MIDDLEWARE ---
+  // --- VITE MIDDLEWARE (Development Only) ---
 
   if (process.env.NODE_ENV !== "production") {
+    // Only import Vite in development mode
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
+    // Production: Serve static files from dist/
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {

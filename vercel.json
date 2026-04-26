@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "npm install --include=optional && npm run build",
+  "buildCommand": "npm ci --include=optional && npm run build",
   "builds": [
     {
       "src": "server.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": "dist/**"
+        "includeFiles": "dist/**",
+        "excludeFiles": "src/**",
+        "zeroConfig": true
       }
     }
   ],
@@ -17,6 +19,9 @@
     }
   ],
   "env": {
+    "NODE_ENV": "production"
+  },
+  "buildEnv": {
     "NODE_ENV": "production"
   }
 }
