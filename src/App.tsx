@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import mitLogo from '../images/mit_adt_logo.png';
+import mitLogo from '../images/mit_adt_logo.png?url';
+// ...existing code...
 import { 
   Shield, 
   Search, 
