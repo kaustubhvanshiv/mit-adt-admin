@@ -124,8 +124,9 @@ Disallow: /api/internal/config
   // --- VITE MIDDLEWARE (Development Only) ---
 
   if (process.env.NODE_ENV !== "production") {
-    // Only import Vite in development mode
-    const { createServer: createViteServer } = await import("vite");
+    // Only import Vite in development mode. Use a dynamic variable to prevent Vercel's nft from tracing it.
+    const viteModule = "vite";
+    const { createServer: createViteServer } = await import(viteModule);
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
