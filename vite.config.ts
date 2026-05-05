@@ -16,9 +16,20 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
-      // HMR can be disabled via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during edits.
+      host: '0.0.0.0',
+      port: 5173,
+      strictPort: true,
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/robots.txt': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

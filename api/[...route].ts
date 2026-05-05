@@ -20,8 +20,8 @@ const ssrfFlag = generateFlag("ssrf", "ssrf");
 const robotsFlag = "FLAG{info-robots-2026-flag}";
 activeFlags["robots"] = robotsFlag;
 const hiddenApiFlag = generateFlag("hidden-api", "api");
-const deleteFlag = "FLAG{student-delete-access-granted-2026}";
-activeFlags["student-delete"] = deleteFlag;
+const deleteFlag = "FLAG{ssrf-delete-user-9921}";
+activeFlags["ssrf-delete"] = deleteFlag;
 
 function sendJson(res: any, status: number, payload: unknown): void {
   res.statusCode = status;
@@ -75,14 +75,6 @@ function getRouteFromPath(pathname: string): string {
     return pathname.slice(5);
   }
 
-  if (pathname === "/api/admin-console") {
-    return "admin-console";
-  }
-
-  if (pathname === "/api/admin-backup") {
-    return "admin-backup";
-  }
-
   return "";
 }
 
@@ -92,32 +84,81 @@ export default async function handler(req: any, res: any): Promise<void> {
   const route = getRouteFromPath(pathname);
   const method = (req.method || "GET").toUpperCase();
 
-  if ((route === "robots" || route === "admin-backup") && method === "GET") {
+  // Helper to check if request is "internal" (simulated for Vercel/Local)
+  const isInternal = req.headers["x-internal-request"] === "true" || 
+                    req.headers["host"]?.includes("localhost") || 
+                    req.headers["x-forwarded-for"] === "127.0.0.1";
+
+  if (route === "robots" && method === "GET") {
     sendText(
       res,
       200,
-      `User-agent: *\nDisallow: /admin\nDisallow: /api/admin-console\nDisallow: /api/internal/config\n`
+      `User-agent: *\nDisallow: /admin\nDisallow: /api/internal/admin-panel\nDisallow: /api/internal/config\n`
     );
     return;
   }
 
-  if (route === "admin-console" && method === "GET") {
+  // --- INTERNAL ADMIN PANEL (Vulnerable to SSRF) ---
+  if (route === "internal/admin-panel" && method === "GET") {
+    if (!isInternal) {
+      sendText(res, 403, "Access Denied: Administrative console is only accessible from the internal university network (localhost).", "text/plain");
+      return;
+    }
+
     sendText(
       res,
       200,
       `
-      <div style="font-family: sans-serif; padding: 20px; border: 2px solid #721c8a; background: #fff;">
-        <h1 style="color: #721c8a;">ADT University - Internal Admin Panel</h1>
-        <p>Welcome, Administrator.</p>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 5px solid #f39200; margin-top: 20px;">
-          <strong>SYSTEM STATUS:</strong> ALL SYSTEMS OPERATIONAL<br>
-          <strong>DATABASE:</strong> CONNECTED<br>
-          <strong>INTERNAL_FLAG:</strong> <span style="color: #ed1c24; font-weight: bold;">${ssrfFlag}</span>
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h1 style="color: #721c8a; margin-top: 0;">ADT Internal Admin Console</h1>
+        <p style="color: #64748b;">Welcome, System Administrator. Manage internal records below.</p>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <h2 style="font-size: 16px; color: #334155;">Active User Sessions</h2>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+              <th style="padding: 10px; font-size: 12px; text-transform: uppercase; color: #94a3b8;">Username</th>
+              <th style="padding: 10px; font-size: 12px; text-transform: uppercase; color: #94a3b8;">Role</th>
+              <th style="padding: 10px; font-size: 12px; text-transform: uppercase; color: #94a3b8;">Action</th>
+            </tr>
+            <tr>
+              <td style="padding: 10px; font-size: 14px;">alice</td>
+              <td style="padding: 10px; font-size: 14px;">Student</td>
+              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=alice" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; font-size: 14px;">carlos</td>
+              <td style="padding: 10px; font-size: 14px;">Staff</td>
+              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=carlos" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 6px;">
+          <p style="color: #9a3412; font-size: 13px; margin: 0;">
+            <strong>System Flag:</strong> ${ssrfFlag}
+          </p>
         </div>
       </div>
     `,
       "text/html"
     );
+    return;
+  }
+
+  // --- DELETE USER ACTION (Exploited via SSRF) ---
+  if (route === "internal/admin-panel/delete" && method === "GET") {
+    if (!isInternal) {
+      sendText(res, 403, "Access Denied: Deletion requires internal system clearance.", "text/plain");
+      return;
+    }
+
+    const username = url.searchParams.get("username");
+    if (username === "carlos") {
+      sendText(res, 200, `Successfully deleted user 'carlos'. System Flag: ${deleteFlag}`, "text/plain");
+    } else {
+      sendText(res, 200, `Successfully deleted user '${username}'.`, "text/plain");
+    }
     return;
   }
 
@@ -130,18 +171,15 @@ export default async function handler(req: any, res: any): Promise<void> {
     sendJson(res, 200, {
       version: "1.0.4-internal",
       db_host: "db.adt-university.internal",
-      db_user: "admin_root",
-      db_pass: "P@ssw0rd123_ADT",
-      api_key: "sk_live_51Mz...[REDACTED]",
       internal_flag: hiddenApiFlag,
-      note: "Do not expose this endpoint to public internet."
     });
     return;
   }
 
+  // --- VULNERABLE SSRF PROXY ---
   if (route === "fetch" && method === "POST") {
     const body = await readJsonBody(req);
-    const fetchUrl = body?.url;
+    let fetchUrl = body?.url;
 
     if (!fetchUrl) {
       sendJson(res, 400, { error: "URL is required" });
@@ -149,6 +187,30 @@ export default async function handler(req: any, res: any): Promise<void> {
     }
 
     try {
+      // Simulation for Vercel: If the URL is localhost, we simulate the internal fetch
+      if (fetchUrl.includes("localhost") || fetchUrl.includes("127.0.0.1")) {
+        const internalUrl = new URL(fetchUrl);
+        const internalPath = internalUrl.pathname + internalUrl.search;
+        
+        // We "recurse" into our own handler with a special internal header
+        const mockReq = {
+          url: internalPath,
+          method: "GET",
+          headers: { ...req.headers, "x-internal-request": "true" }
+        };
+        
+        let output = "";
+        const mockRes = {
+          statusCode: 200,
+          setHeader: () => {},
+          end: (data: string) => { output = data; }
+        };
+        
+        await handler(mockReq, mockRes);
+        sendText(res, 200, output, "text/plain");
+        return;
+      }
+
       const response = await fetch(fetchUrl);
       const data = await response.text();
       sendText(res, 200, data, "text/plain");

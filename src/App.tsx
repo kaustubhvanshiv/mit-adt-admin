@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import AdminPanel from './AdminPanel';
 import mitLogo from '../images/mit_adt_logo.png?url';
+import LoginPage from './components/LoginPage';
+import ProfilePage from './components/ProfilePage';
+import StaffPage from './components/StaffPage';
+import AboutPageNew from './components/AboutPage';
+import AcademicsPageNew from './components/AcademicsPage';
+import AdminHiddenPage from './components/AdminHiddenPage';
 // ...existing code...
 import { 
   Shield, 
@@ -32,20 +38,22 @@ import {
 
 // --- Types ---
 
-type Page = 'landing' | 'admin' | 'submission' | 'about' | 'academics' | 'diagnostic';
+type Page = 'landing' | 'admin' | 'submission' | 'about' | 'academics' | 'diagnostic' | 'login' | 'profile' | 'staff' | 'hidden-admin';
 
 interface SolvedState {
   ssrf: boolean;
   robots: boolean;
   'hidden-api': boolean;
   'student-delete': boolean;
+  'ssrf-delete': boolean;
 }
 
 // --- Components ---
 
-const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void, currentPage: Page }) => {
+const Header = ({ onNavigate, currentPage, user }: { onNavigate: (page: Page) => void, currentPage: Page, user: string | null }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showXssResult, setShowXssResult] = useState(false);
+  const [xssToast, setXssToast] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,146 +61,140 @@ const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void,
     
     setShowXssResult(true);
 
-    // XSS Simulation: If the input looks like a script, we trigger an alert with the flag
-    if (searchQuery.toLowerCase().includes('<script>') || searchQuery.toLowerCase().includes('alert(')) {
-      setTimeout(() => {
-        alert("XSS EXPLOIT DETECTED!\nFlag: FLAG{xss-search-injection-9912}");
-      }, 100);
+    // XSS Simulation: If the input looks like a script, show toast with flag
+    if (searchQuery.toLowerCase().includes('<script>') || searchQuery.toLowerCase().includes('alert(') || searchQuery.toLowerCase().includes('onerror') || searchQuery.toLowerCase().includes('onload')) {
+      setXssToast(true);
+      setTimeout(() => setXssToast(false), 8000);
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50">
-      {/* Colorful Top Accent Bar */}
-      <div className="h-2 flex w-full">
-        <div className="h-full w-1/4 bg-mit-red" />
-        <div className="h-full w-1/4 bg-mit-orange" />
-        <div className="h-full w-1/4 bg-mit-green" />
-        <div className="h-full w-1/4 bg-mit-cyan" />
-      </div>
-
-      {/* Main Header */}
-      <header className="bg-mit-purple text-white px-8 py-0">
-        <div className="max-w-7xl mx-auto">
-          {/* Top Row: Logo, Branding, and Top Right Links */}
-          <div className="flex items-center justify-between mb-0">
-            {/* Logo Only */}
-            <div className="flex items-center cursor-pointer" onClick={() => onNavigate('landing')}>
-              <div className="w-64 h-30 flex items-center justify-center flex-shrink-0 py-5">
-                <img 
-                  src={mitLogo}
-                  alt="MIT ADT Logo" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
-
-            {/* Top Right: Quick Links and Buttons */}
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex gap-1.5">
-                <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">VC-SMS</button>
-                <button className="bg-mit-orange text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">ODL / OL</button>
-                <button className="bg-mit-green text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Login</button>
-                <button className="bg-mit-red text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Life @ Campus</button>
-                <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Contact Us</button>
-              </div>
-              {/* Secondary Links */}
-              <div className="text-[12px] flex gap-2 text-white/80">
-                <button className="hover:text-white transition">Careers</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">Alumni</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">Happenings</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">Exams</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">International</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">NAAC</button>
-                <span className="text-white/50">|</span>
-                <button className="hover:text-white transition">Disclosures</button>
-              </div>
-            </div>
+    <>
+      {/* XSS Flag Toast Notification */}
+      {xssToast && (
+        <div className="fixed top-4 right-4 z-[9999] flex items-start gap-3 bg-slate-900 border border-emerald-500 text-white rounded-2xl shadow-2xl p-5 max-w-sm">
+          <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-white" />
           </div>
-
-          {/* Divider Line */}
-          <div className="h-px bg-white/20 my-0"></div>
-
-          {/* Social Icons and Main Navigation */}
-          <div className="flex items-center justify-between">
-            {/* Main Navigation */}
-            <nav className="flex gap-8 items-center">
-              <button 
-                onClick={() => onNavigate('landing')}
-                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'landing' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
-              >
-                Home
-              </button>
-              <button 
-                onClick={() => onNavigate('about')}
-                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'about' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
-              >
-                About Us
-              </button>
-              <button 
-                onClick={() => onNavigate('academics')}
-                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'academics' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
-              >
-                Academics
-              </button>
-            </nav>
-
-            {/* Social Media Icons & Vulnerable Search Bar */}
-            <div className="flex gap-3 items-center">
-              <form onSubmit={handleSearch} className="relative group mr-4">
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search campus..."
-                  className="bg-white/10 border border-white/20 rounded-full py-1.5 px-4 pr-10 text-xs text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all w-48 group-hover:w-64"
-                />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <Search className="w-4 h-4 text-white/70 hover:text-white transition" />
-                </button>
-                {showXssResult && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl p-4 text-slate-900 border border-slate-200 animate-in fade-in slide-in-from-top-2 z-[100]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Search Results for:</span>
-                      <button onClick={() => setShowXssResult(false)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
-                    </div>
-                    {/* VULNERABILITY: Reflected XSS */}
-                    <div 
-                      className="text-sm font-bold text-mit-purple break-all"
-                      dangerouslySetInnerHTML={{ __html: searchQuery }}
-                    />
-                    <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] text-slate-400 italic">
-                      0 results found. Try broader keywords.
-                    </div>
-                  </div>
-                )}
-              </form>
-
-              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
+          <div className="flex-1">
+            <p className="text-xs font-black uppercase tracking-widest text-emerald-400 mb-1">XSS Exploit Triggered!</p>
+            <p className="text-[11px] text-slate-400 mb-2">Reflected XSS via search input — script injected into DOM.</p>
+            <code className="text-sm font-mono font-bold text-white bg-white/10 px-2 py-1 rounded block">
+              FLAG&#123;xss-search-injection-9912&#125;
+            </code>
           </div>
+          <button onClick={() => setXssToast(false)} className="text-slate-500 hover:text-white transition shrink-0">
+            <X className="w-4 h-4" />
+          </button>
         </div>
-      </header>
-    </div>
+      )}
+
+      <div className="relative top-0 left-0 right-0 z-50">
+        {/* Colorful Top Accent Bar */}
+        <div className="h-2 flex w-full">
+          <div className="h-full w-1/4 bg-mit-red" />
+          <div className="h-full w-1/4 bg-mit-orange" />
+          <div className="h-full w-1/4 bg-mit-green" />
+          <div className="h-full w-1/4 bg-mit-cyan" />
+        </div>
+
+        {/* Main Header */}
+        <header className="bg-mit-purple text-white px-8 py-0 shadow-lg">
+          <div className="max-w-7xl mx-auto">
+            {/* Top Row */}
+            <div className="flex items-center justify-between mb-0">
+              <div className="flex items-center cursor-pointer" onClick={() => onNavigate('landing')}>
+                <div className="w-64 h-30 flex items-center justify-center flex-shrink-0 py-5">
+                  <img src={mitLogo} alt="MIT ADT Logo" className="w-full h-full object-contain" />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-1.5">
+                  <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">VC-SMS</button>
+                  <button className="bg-mit-orange text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">ODL / OL</button>
+                  <button
+                    onClick={() => onNavigate(user ? 'profile' : 'login')}
+                    className="bg-mit-green text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-2"
+                  >
+                    {user ? (
+                      <>
+                        <div className="w-4 h-4 rounded-full bg-white/20 overflow-hidden">
+                          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user}`} alt="" />
+                        </div>
+                        Profile
+                      </>
+                    ) : 'Login'}
+                  </button>
+                  <button className="bg-mit-red text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Life @ Campus</button>
+                  <button className="bg-mit-cyan text-white px-4 py-1.5 rounded text-[12px] font-bold uppercase tracking-wider hover:brightness-110 transition-all">Contact Us</button>
+                </div>
+                <div className="text-[12px] flex gap-2 text-white/80">
+                  <button className="hover:text-white transition">Careers</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">Alumni</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">Happenings</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">Exams</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">International</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">NAAC</button>
+                  <span className="text-white/50">|</span>
+                  <button className="hover:text-white transition">Disclosures</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px bg-white/20 my-0"></div>
+
+            <div className="flex items-center justify-between">
+              <nav className="flex gap-8 items-center">
+                <button onClick={() => onNavigate('landing')} className={`text-sm font-bold uppercase tracking-widest transition-all py-3 border-b-2 ${currentPage === 'landing' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}>Home</button>
+                <button onClick={() => onNavigate('about')} className={`text-sm font-bold uppercase tracking-widest transition-all py-3 border-b-2 ${currentPage === 'about' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}>About Us</button>
+                <button onClick={() => onNavigate('academics')} className={`text-sm font-bold uppercase tracking-widest transition-all py-3 border-b-2 ${currentPage === 'academics' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}>Academics</button>
+                <button onClick={() => onNavigate('staff')} className={`text-sm font-bold uppercase tracking-widest transition-all py-3 border-b-2 ${currentPage === 'staff' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}>Staff Portal</button>
+              </nav>
+
+              <div className="flex gap-3 items-center">
+                <form onSubmit={handleSearch} className="relative group mr-4">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search campus..."
+                    className="bg-white/10 border border-white/20 rounded-full py-1.5 px-4 pr-10 text-xs text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all w-48 group-hover:w-64"
+                  />
+                  <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Search className="w-4 h-4 text-white/70 hover:text-white transition" />
+                  </button>
+                  {showXssResult && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl p-4 text-slate-900 border border-slate-200 z-[100]">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Search Results for:</span>
+                        <button onClick={() => setShowXssResult(false)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+                      </div>
+                      {/* VULNERABILITY: Reflected XSS */}
+                      <div className="text-sm font-bold text-mit-purple break-all" dangerouslySetInnerHTML={{ __html: searchQuery }} />
+                      <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] text-slate-400 italic">
+                        0 results found. Try broader keywords.
+                      </div>
+                    </div>
+                  )}
+                </form>
+
+                <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all"><Facebook className="w-5 h-5" /></a>
+                <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all"><Instagram className="w-5 h-5" /></a>
+                <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all"><Linkedin className="w-5 h-5" /></a>
+                <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all"><Twitter className="w-5 h-5" /></a>
+                <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all"><Youtube className="w-5 h-5" /></a>
+              </div>
+            </div>
+          </div>
+        </header>
+      </div>
+    </>
   );
 };
 
@@ -228,33 +230,30 @@ const Sidebar = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void
 
 const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (vuln: keyof SolvedState) => void }) => {
   const [flag, setFlag] = useState('');
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Client-side flag registry — no server required
+  const FLAG_MAP: Record<string, keyof SolvedState> = {
+    'FLAG{xss-search-injection-9912}': 'ssrf',        // XSS via search bar
+    'FLAG{info-robots-2026-flag}': 'robots',           // robots.txt discovery
+    'FLAG{robots-txt-is-not-security-882}': 'robots',  // /admin via robots.txt
+    'FLAG{ssrf-delete-user-9921}': 'ssrf-delete',      // SSRF delete exploit
+    'FLAG{student-delete-access-granted-2026}': 'student-delete', // Admin panel delete
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMessage(null);
 
-    try {
-      const res = await fetch('/api/submit-flag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flag })
-      });
-      const data = await res.json();
+    const trimmed = flag.trim();
+    const vulnerability = FLAG_MAP[trimmed];
 
-      if (data.success) {
-        setMessage({ type: 'success', text: data.message });
-        onSolve(data.vulnerability as keyof SolvedState);
-        setFlag('');
-      } else {
-        setMessage({ type: 'error', text: data.message });
-      }
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Connection failed. Is the server running?' });
-    } finally {
-      setLoading(false);
+    if (vulnerability) {
+      setMessage({ type: 'success', text: `✅ Correct! You solved the "${vulnerability}" challenge.` });
+      onSolve(vulnerability);
+      setFlag('');
+    } else {
+      setMessage({ type: 'error', text: '❌ Incorrect flag. Check your exploit and try again.' });
     }
   };
 
@@ -283,10 +282,9 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
 
           <button 
             type="submit"
-            disabled={loading}
             className="btn"
           >
-            {loading ? 'Validating...' : 'Submit'}
+            Submit Flag
           </button>
         </form>
 
@@ -542,7 +540,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
                     View More
                     <ChevronRight className="h-4 w-4" />
                   </a>
-                  <button onClick={() => onNavigate('admin')} className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-white/20">
+                  <button onClick={() => onNavigate('staff')} className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-white/20">
                     Staff Portal
                   </button>
                   <button onClick={() => onNavigate('submission')} className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition hover:bg-white/10">
@@ -1178,18 +1176,24 @@ const AcademicsPage = () => {
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
+  const [user, setUser] = useState<string | null>(null);
   const [solved, setSolved] = useState<SolvedState>({
     ssrf: false,
     robots: false,
     'hidden-api': false,
-    'student-delete': false
+    'student-delete': false,
+    'ssrf-delete': false
   });
 
   useEffect(() => {
     const handleLocation = () => {
-      const path = window.location.pathname;
+      const path = window.location.pathname.replace(/\/$/, '') || '/';
       if (path === '/admin') {
+        setCurrentPage('hidden-admin');
+      } else if (path === '/staff-portal') {
         setCurrentPage('admin');
+      } else if (path === '/staff') {
+        setCurrentPage('staff');
       } else if (path === '/submission') {
         setCurrentPage('submission');
       } else if (path === '/about') {
@@ -1198,6 +1202,10 @@ export default function App() {
         setCurrentPage('academics');
       } else if (path === '/diagnostic') {
         setCurrentPage('diagnostic');
+      } else if (path === '/login') {
+        setCurrentPage('login');
+      } else if (path === '/profile') {
+        setCurrentPage('profile');
       } else {
         setCurrentPage('landing');
       }
@@ -1217,6 +1225,14 @@ export default function App() {
     window.history.pushState({}, '', path);
   };
 
+  const handleLogin = (username: string) => {
+    setUser(username);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    navigate('landing');
+  };
 
   const handleSolve = (vuln: keyof SolvedState) => {
     setSolved(prev => ({ ...prev, [vuln]: true }));
@@ -1226,27 +1242,38 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <Header onNavigate={navigate} currentPage={currentPage} />
+      <Header onNavigate={navigate} currentPage={currentPage} user={user} />
       
-      <div className="flex grow mt-[160px] h-[calc(100vh-160px)] overflow-hidden">
+      <div className="flex grow overflow-hidden">
         <Sidebar onNavigate={navigate} currentPage={currentPage} />
         
-        <main className="grow overflow-y-auto bg-bg">
-            {isAllSolved ? (
-              <Congratulations />
-            ) : currentPage === 'landing' ? (
-              <LandingPage onNavigate={navigate} />
-            ) : currentPage === 'about' ? (
-              <AboutPage />
-            ) : currentPage === 'academics' ? (
-              <AcademicsPage />
-            ) : currentPage === 'diagnostic' ? (
-              <PublicDiagnosticTool />
-            ) : currentPage === 'admin' ? (
-              <AdminPanel onDeleteAttempt={() => {}} />
-            ) : (
-              <SubmissionPanel solved={solved} onSolve={handleSolve} />
-            )}
+        <main className="grow overflow-y-auto bg-bg p-8 min-h-screen">
+          <div className="mb-4 p-2 bg-slate-100 text-[10px] font-mono text-slate-400 uppercase tracking-widest border-b border-slate-200">
+            System Console Active | Node: ADT-SEC-01
+          </div>
+          {isAllSolved ? (
+            <Congratulations />
+          ) : currentPage === 'landing' ? (
+            <LandingPage onNavigate={navigate} />
+          ) : currentPage === 'about' ? (
+            <AboutPageNew />
+          ) : currentPage === 'academics' ? (
+            <AcademicsPageNew />
+          ) : currentPage === 'staff' ? (
+            <StaffPage />
+          ) : currentPage === 'login' ? (
+            <LoginPage onLogin={handleLogin} onNavigate={navigate} />
+          ) : currentPage === 'profile' ? (
+            user ? <ProfilePage user={user} onLogout={handleLogout} /> : <LoginPage onLogin={handleLogin} onNavigate={navigate} />
+          ) : currentPage === 'hidden-admin' ? (
+            <AdminHiddenPage />
+          ) : currentPage === 'diagnostic' ? (
+            <PublicDiagnosticTool />
+          ) : currentPage === 'admin' ? (
+            <AdminPanel onDeleteAttempt={() => {}} />
+          ) : (
+            <SubmissionPanel solved={solved} onSolve={handleSolve} />
+          )}
         </main>
       </div>
     </div>

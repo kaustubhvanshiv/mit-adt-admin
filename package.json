@@ -9,6 +9,8 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:api": "tsx watch server.ts",
+    "dev:all": "npm run dev:api & npm run dev",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
