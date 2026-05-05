@@ -27,8 +27,7 @@ import {
   Instagram,
   Linkedin,
   Twitter,
-  Youtube,
-  Trash2
+  Youtube
 } from 'lucide-react';
 
 // --- Types ---
@@ -862,25 +861,25 @@ const AboutPage = () => {
           {
             title: "Overview",
             content: "Established as part of the MIT Group of Institutions, MIT ADT bridges the gap between academic learning and real-world application by integrating practical exposure into its curriculum. The university aims to foster innovation and creativity while maintaining academic excellence.",
-            icon: Globe,
+            icon: BookOpen,
             color: 'text-mit-cyan'
           },
           {
             title: "Academic Excellence",
             content: "MIT ADT has built a strong reputation for combining technology with design, arts, and management. It offers a wide range of undergraduate, postgraduate, and doctoral programs across multiple disciplines including engineering, design, management, fine arts, and film & media. The academic structure emphasizes experiential learning, encouraging students to participate in projects, research, and industry collaborations through workshops, labs, and interdisciplinary programs.",
-            icon: Shield,
+            icon: GraduationCap,
             color: 'text-mit-purple'
           },
           {
             title: "Campus & Environment",
             content: "The campus in Pune provides a modern and dynamic learning environment with well-equipped laboratories, design studios, and collaborative spaces. Students are encouraged to engage in extracurricular activities, cultural events, and entrepreneurship initiatives, contributing to their overall personal and professional growth.",
-            icon: Server,
+            icon: Building2,
             color: 'text-mit-orange'
           },
           {
             title: "Vision & Development",
             content: "MIT ADT University focuses on holistic development, ensuring that students not only gain academic knowledge but also build leadership, communication, and problem-solving abilities. With a strong emphasis on industry readiness, the university prepares students to adapt to evolving global challenges and career opportunities through its commitment to quality education and innovation.",
-            icon: CheckCircle2,
+            icon: Target,
             color: 'text-mit-green'
           }
         ].map((section, i) => (
