@@ -1,27 +1,24 @@
 {
   "version": 2,
   "buildCommand": "npm ci --include=optional && npm run build",
-  "builds": [
-    {
-      "src": "server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "dist/**",
-        "excludeFiles": "src/**",
-        "zeroConfig": true
-      }
+  "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x"
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.ts"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
   },
-  "buildEnv": {
-    "NODE_ENV": "production"
-  }
+  "rewrites": [
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
+    {
+      "source": "/admin",
+      "destination": "/api/admin"
+    },
+    {
+      "source": "/admin-backup",
+      "destination": "/api/admin-backup"
+    }
+  ]
 }
