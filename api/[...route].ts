@@ -17,8 +17,11 @@ function generateFlag(id: string, type: string = "lab"): string {
 }
 
 const ssrfFlag = generateFlag("ssrf", "ssrf");
-const robotsFlag = generateFlag("robots", "info");
+const robotsFlag = "FLAG{info-robots-2026-flag}";
+activeFlags["robots"] = robotsFlag;
 const hiddenApiFlag = generateFlag("hidden-api", "api");
+const deleteFlag = "FLAG{student-delete-access-granted-2026}";
+activeFlags["student-delete"] = deleteFlag;
 
 function sendJson(res: any, status: number, payload: unknown): void {
   res.statusCode = status;
@@ -72,11 +75,11 @@ function getRouteFromPath(pathname: string): string {
     return pathname.slice(5);
   }
 
-  if (pathname === "/admin") {
-    return "admin";
+  if (pathname === "/api/admin-console") {
+    return "admin-console";
   }
 
-  if (pathname === "/admin-backup") {
+  if (pathname === "/api/admin-backup") {
     return "admin-backup";
   }
 
@@ -93,12 +96,12 @@ export default async function handler(req: any, res: any): Promise<void> {
     sendText(
       res,
       200,
-      `User-agent: *\nDisallow: /admin\nDisallow: /admin-backup\nDisallow: /api/internal/config\n# Hint: Flag for robots discovery -> ${robotsFlag}\n`
+      `User-agent: *\nDisallow: /admin\nDisallow: /api/admin-console\nDisallow: /api/internal/config\n`
     );
     return;
   }
 
-  if (route === "admin" && method === "GET") {
+  if (route === "admin-console" && method === "GET") {
     sendText(
       res,
       200,
@@ -157,18 +160,18 @@ export default async function handler(req: any, res: any): Promise<void> {
 
   if (route === "submit-flag" && method === "POST") {
     const body = await readJsonBody(req);
-    const vulnerability = body?.vulnerability;
     const flag = body?.flag;
 
-    if (!vulnerability || !flag) {
-      sendJson(res, 400, { error: "Vulnerability type and flag are required" });
+    if (!flag) {
+      sendJson(res, 400, { error: "Flag is required" });
       return;
     }
 
-    const expectedFlag = activeFlags[vulnerability];
+    const matchedEntry = Object.entries(activeFlags).find(([, expectedFlag]) => expectedFlag === flag);
 
-    if (flag === expectedFlag) {
-      sendJson(res, 200, { success: true, message: `Correct! You solved the ${vulnerability} challenge.` });
+    if (matchedEntry) {
+      const [vulnerability] = matchedEntry;
+      sendJson(res, 200, { success: true, vulnerability, message: `Correct! You solved the ${vulnerability} challenge.` });
       return;
     }
 

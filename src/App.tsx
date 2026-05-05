@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import AdminPanel from './AdminPanel';
 import mitLogo from '../images/mit_adt_logo.png?url';
 // ...existing code...
 import { 
@@ -26,22 +27,41 @@ import {
   Instagram,
   Linkedin,
   Twitter,
-  Youtube
+  Youtube,
+  Trash2
 } from 'lucide-react';
 
 // --- Types ---
 
-type Page = 'landing' | 'admin' | 'submission' | 'about' | 'academics';
+type Page = 'landing' | 'admin' | 'submission' | 'about' | 'academics' | 'diagnostic';
 
 interface SolvedState {
   ssrf: boolean;
   robots: boolean;
   'hidden-api': boolean;
+  'student-delete': boolean;
 }
 
 // --- Components ---
 
 const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void, currentPage: Page }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showXssResult, setShowXssResult] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    setShowXssResult(true);
+
+    // XSS Simulation: If the input looks like a script, we trigger an alert with the flag
+    if (searchQuery.toLowerCase().includes('<script>') || searchQuery.toLowerCase().includes('alert(')) {
+      setTimeout(() => {
+        alert("XSS EXPLOIT DETECTED!\nFlag: FLAG{xss-search-injection-9912}");
+      }, 100);
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
       {/* Colorful Top Accent Bar */}
@@ -121,22 +141,39 @@ const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void,
               >
                 Academics
               </button>
-              <button 
-                onClick={() => onNavigate('admin')}
-                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'admin' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
-              >
-                System Console
-              </button>
-              <button 
-                onClick={() => onNavigate('submission')}
-                className={`text-sm font-bold uppercase tracking-widest transition-all py-2 border-b-2 ${currentPage === 'submission' ? 'border-mit-orange text-mit-orange' : 'border-transparent text-white hover:text-mit-orange'}`}
-              >
-                Flag Submission
-              </button>
             </nav>
 
-            {/* Social Media Icons */}
+            {/* Social Media Icons & Vulnerable Search Bar */}
             <div className="flex gap-3 items-center">
+              <form onSubmit={handleSearch} className="relative group mr-4">
+                <input 
+                  type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search campus..."
+                  className="bg-white/10 border border-white/20 rounded-full py-1.5 px-4 pr-10 text-xs text-white placeholder-white/50 focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all w-48 group-hover:w-64"
+                />
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <Search className="w-4 h-4 text-white/70 hover:text-white transition" />
+                </button>
+                {showXssResult && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl p-4 text-slate-900 border border-slate-200 animate-in fade-in slide-in-from-top-2 z-[100]">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Search Results for:</span>
+                      <button onClick={() => setShowXssResult(false)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
+                    </div>
+                    {/* VULNERABILITY: Reflected XSS */}
+                    <div 
+                      className="text-sm font-bold text-mit-purple break-all"
+                      dangerouslySetInnerHTML={{ __html: searchQuery }}
+                    />
+                    <div className="mt-4 pt-3 border-t border-slate-100 text-[10px] text-slate-400 italic">
+                      0 results found. Try broader keywords.
+                    </div>
+                  </div>
+                )}
+              </form>
+
               <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
                 <Facebook className="w-5 h-5" />
               </a>
@@ -152,7 +189,6 @@ const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void,
               <a href="#" className="w-9 h-9 bg-white text-mit-purple rounded-full flex items-center justify-center hover:brightness-95 transition-all">
                 <Youtube className="w-5 h-5" />
               </a>
-              <Search className="w-6 h-6 text-white cursor-pointer hover:text-mit-orange transition" />
             </div>
           </div>
         </div>
@@ -163,32 +199,27 @@ const Header = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void,
 
 const Sidebar = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void, currentPage: Page }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutDashboard, page: 'admin' as Page },
-    { id: 'records', label: 'Student Records', icon: FileText, page: 'admin' as Page },
-    { id: 'catalog', label: 'Course Catalog', icon: Database, page: 'admin' as Page },
-    { id: 'diagnostic', label: 'External Diagnostic Tool', icon: Terminal, page: 'admin' as Page },
+    { id: 'home', label: 'Home Page', icon: LayoutDashboard, page: 'landing' as Page },
+    { id: 'diagnostic', label: 'External Diagnostic Tool', icon: Terminal, page: 'diagnostic' as Page },
     { id: 'submission', label: 'Flag Submission', icon: Shield, page: 'submission' as Page },
-    { id: 'backups', label: 'System Backups', icon: History, page: 'admin' as Page },
-    { id: 'api', label: 'API Configuration', icon: Settings, page: 'admin' as Page },
-    { id: 'audit', label: 'Audit Logs', icon: Activity, page: 'admin' as Page },
   ];
 
   return (
     <aside className="w-64 bg-white border-r border-border py-8 flex flex-col gap-1 shrink-0 h-full overflow-y-auto shadow-sm">
       <div className="px-6 mb-6">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Management</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Navigation</p>
       </div>
       {menuItems.map((item) => (
         <button
           key={item.id}
           onClick={() => onNavigate(item.page)}
           className={`px-6 py-3.5 flex items-center gap-3 text-sm font-semibold border-r-4 transition-all ${
-            currentPage === item.page && (item.id === 'diagnostic' || item.id === 'submission')
+            currentPage === item.page
               ? 'bg-mit-purple/5 text-mit-purple border-mit-purple'
               : 'text-slate-600 border-transparent hover:bg-slate-50'
           }`}
         >
-          <item.icon className={`w-4 h-4 ${currentPage === item.page && (item.id === 'diagnostic' || item.id === 'submission') ? 'text-mit-purple' : 'text-slate-400'}`} />
+          <item.icon className={`w-4 h-4 ${currentPage === item.page ? 'text-mit-purple' : 'text-slate-400'}`} />
           {item.label}
         </button>
       ))}
@@ -197,7 +228,6 @@ const Sidebar = ({ onNavigate, currentPage }: { onNavigate: (page: Page) => void
 };
 
 const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (vuln: keyof SolvedState) => void }) => {
-  const [selectedVuln, setSelectedVuln] = useState<string>('ssrf');
   const [flag, setFlag] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -211,13 +241,13 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
       const res = await fetch('/api/submit-flag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vulnerability: selectedVuln, flag })
+        body: JSON.stringify({ flag })
       });
       const data = await res.json();
 
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
-        onSolve(selectedVuln as keyof SolvedState);
+        onSolve(data.vulnerability as keyof SolvedState);
         setFlag('');
       } else {
         setMessage({ type: 'error', text: data.message });
@@ -229,14 +259,6 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
     }
   };
 
-  const vulnerabilities = [
-    { id: 'ssrf', label: 'SSRF (Server-Side Request Forgery)' },
-    { id: 'robots', label: 'robots.txt Information Disclosure' },
-    { id: 'hidden-api', label: 'Hidden API Endpoint' },
-    { id: 'xss', label: 'Cross-Site Scripting (Dummy)' },
-    { id: 'sqli', label: 'SQL Injection (Dummy)' },
-  ];
-
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="card">
@@ -245,33 +267,19 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
           Flag Submission Panel
         </div>
         <p className="text-[13px] text-text-muted mb-8 leading-relaxed">
-          Found a flag? Select the vulnerability category and enter the flag string below to validate your solution and track your progress.
+          Enter your submission and choose the matching category to validate it.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="label">Vulnerability Category</label>
-              <select 
-                value={selectedVuln}
-                onChange={(e) => setSelectedVuln(e.target.value)}
-                className="input bg-white"
-              >
-                {vulnerabilities.map(v => (
-                  <option key={v.id} value={v.id}>{v.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="label">Flag String</label>
-              <input 
-                type="text"
-                value={flag}
-                onChange={(e) => setFlag(e.target.value)}
-                placeholder="FLAG{lab-xxxx-xxxx-xxxx-xxxx}"
-                className="input"
-              />
-            </div>
+          <div className="flex flex-col gap-2">
+            <label className="label">Submission Value</label>
+            <input 
+              type="text"
+              value={flag}
+              onChange={(e) => setFlag(e.target.value)}
+              placeholder="Enter your submission here"
+              className="input"
+            />
           </div>
 
           <button 
@@ -279,7 +287,7 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
             disabled={loading}
             className="btn"
           >
-            {loading ? 'Validating...' : 'Submit Flag'}
+            {loading ? 'Validating...' : 'Submit'}
           </button>
         </form>
 
@@ -295,24 +303,49 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
             <div className="text-sm font-medium">{message.text}</div>
           </motion.div>
         )}
+      </div>
+    </div>
+  );
+};
 
-        <div className="mt-12">
-          <h3 className="text-sm font-bold text-slate-800 mb-4 uppercase tracking-wider">Lab Progress</h3>
-          <div className="space-y-3">
-            {vulnerabilities.filter(v => !v.label.includes('Dummy')).map(v => (
-              <div key={v.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-md border border-border">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${solved[v.id as keyof SolvedState] ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                  <span className="text-sm font-semibold text-slate-700">{v.label}</span>
-                </div>
-                {solved[v.id as keyof SolvedState] ? (
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-100 px-2 py-1 rounded">Solved</span>
-                ) : (
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-200 px-2 py-1 rounded">Pending</span>
-                )}
-              </div>
-            ))}
+const PublicDiagnosticTool = () => {
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <div className="card border-2 border-slate-200">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-slate-100 rounded-lg">
+            <Terminal className="w-5 h-5 text-slate-400" />
           </div>
+          <h3 className="text-xl font-bold text-slate-900">External Diagnostic Utility</h3>
+        </div>
+        
+        <div className="bg-amber-50 border border-amber-100 p-6 rounded-2xl mb-8 flex items-start gap-4">
+          <Lock className="w-6 h-6 text-amber-500 shrink-0 mt-1" />
+          <div>
+            <h4 className="font-bold text-amber-900">Access Restricted</h4>
+            <p className="text-sm text-amber-700 leading-relaxed mt-1">
+              The full diagnostic suite is only available to authorized system administrators. 
+              Please log in through the primary administrative gateway to access advanced probing features.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-6 opacity-50 grayscale pointer-events-none">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Resource Target URL</label>
+            <div className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-400 font-mono text-sm">
+              http://internal-status.adt.university
+            </div>
+          </div>
+          <button className="px-8 py-4 bg-slate-200 text-slate-400 rounded-2xl font-black uppercase tracking-widest text-xs">
+            Execute Probe (Disabled)
+          </button>
+        </div>
+
+        <div className="mt-10 pt-8 border-t border-slate-100">
+          <p className="text-xs text-slate-400 text-center font-medium">
+            System Node: ADT-PN-EDGE-04 | Status: Idle
+          </p>
         </div>
       </div>
     </div>
@@ -350,63 +383,458 @@ const Congratulations = () => {
 };
 
 const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
-  return (
-    <div className="p-10 max-w-6xl mx-auto">
-      <div className="card mb-10 overflow-hidden relative min-h-[400px] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1200" 
-            alt="University Campus" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-mit-purple via-mit-purple/80 to-mit-orange/40" />
-        </div>
-        <div className="relative z-10 p-10 text-white">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block bg-mit-orange text-white font-bold uppercase tracking-widest text-[10px] px-3 py-1 rounded mb-4">
-              Global Thinkers
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Future Engineers. <br />
-              <span className="text-mit-cyan">Inspiring Minds.</span>
-            </h1>
-            <p className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
-              ADT University provides world-class education and research opportunities in the heart of the digital age. Join our community of scholars and innovators.
-            </p>
-            <div className="flex gap-4">
-              <button className="bg-mit-purple text-white px-8 py-3 rounded font-bold text-sm uppercase tracking-widest hover:brightness-110 transition-all shadow-lg">
-                View More
-              </button>
-              <button 
-                onClick={() => onNavigate('admin')}
-                className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded font-bold text-sm uppercase tracking-widest hover:bg-white/20 transition-all"
-              >
-                Staff Portal
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </div>
+  const heroPanels = [
+    {
+      eyebrow: 'The New Age University for',
+      title: 'Innovation & Entrepreneurship',
+      text: 'A future-focused campus environment built for innovators, creators, scientists, and leaders.',
+    },
+    {
+      eyebrow: 'The pursuit of',
+      title: 'Excellence Begins Here',
+      text: 'Academic ambition, industry exposure, and a holistic learning culture come together on one campus.',
+    },
+    {
+      eyebrow: 'Global Thinkers.',
+      title: 'Future Engineers. Inspiring Minds.',
+      text: 'Programs and student life designed to shape confident, ready-to-build graduates.',
+    },
+    {
+      eyebrow: 'Building Careers.',
+      title: 'Transforming Lives.',
+      text: 'Placement-oriented learning and strong partnerships support long-term student success.',
+    },
+    {
+      eyebrow: 'The University for',
+      title: 'Holistic Development',
+      text: 'Academic depth, discipline, creativity, and campus culture working together as one experience.',
+    },
+  ];
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          { title: "Academic Rigor", desc: "Consistently ranked among the top 1% of universities globally.", icon: Shield, color: 'text-mit-purple' },
-          { title: "Global Network", desc: "Connect with over 500,000 alumni across 120 countries.", icon: Globe, color: 'text-mit-orange' },
-          { title: "Future Ready", desc: "Curriculum designed in partnership with industry leaders.", icon: Server, color: 'text-mit-green' }
-        ].map((f, i) => (
-          <div key={i} className="card hover:shadow-md transition-shadow group">
-            <div className={`w-12 h-12 bg-slate-50 flex items-center justify-center rounded-lg mb-5 group-hover:scale-110 transition-transform`}>
-              <f.icon className={`${f.color} w-6 h-6`} />
+  const highlightCards = [
+    { label: 'A Grade', value: 'NAAC Accredited MIT-ADT University', color: 'from-mit-purple to-mit-purple/70' },
+    { label: 'Student', value: 'Your Success. Our Tradition.', color: 'from-mit-orange to-mit-orange/70' },
+    { label: 'Alumni', value: 'One Purpose. One Mission. One Dream.', color: 'from-mit-green to-mit-green/70' },
+    { label: 'Corporate', value: 'Hire Fresh Talent at MIT-ADT University', color: 'from-mit-cyan to-mit-cyan/70' },
+  ];
+
+  const statCards = [
+    { value: '+', label: 'Startups Incubated' },
+    { value: '+ Cr', label: 'External Funding' },
+    { value: '+', label: 'Publications' },
+  ];
+
+  const newsCards = [
+    'MIT ADT University Partners with Bentley Systems; Launches Centre of Excellence for Infrastructure Innovation',
+    'MIT-ADT University Pune becomes first in Maharashtra to earn DASCA accreditation for AI and data science programmes',
+    'Viksit Bharat requires collective responsibility, says Vandana Chavan at MIT-ADT national conference',
+    'India Needs Semiconductor Self-Reliance, Says Dr Mangesh Karad at national seminar on semiconductor technology',
+  ];
+
+  const programCards = [
+    { title: 'Engineering', items: ['B.Tech.', 'M.Tech.', 'M.Sc.', 'Integrated M.Tech.', 'PhD Programme'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-engineering/MIT-School-of-Engineering-and-Sciences/programs-offered/' },
+    { title: 'Design', items: ['Bachelor of Design', 'Master of Design', 'PG Diploma in Innovation', 'PhD in Design'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-design/mit-institute-of-design/programs-offered/' },
+    { title: 'Management', items: ['BBA', 'BCom', 'BCA', 'MBA', 'MCA', 'PhD Programs'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-management-and-leadership/mit-college-of-management/programs-offered/' },
+    { title: 'Architecture', items: ['B.Arch.', 'M.Arch – TIAKS', 'M.Plan', 'PhD Programs'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-design-and-architecture/mit-school-of-architecture/programs-offered/' },
+    { title: 'Vedic Science / Psychology', items: ['BSc Hons. Psychology', 'MSc (Clinical Psychology)', 'PhD Program'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-humanities-and-social-sciences/mit-school-of-vedic-sciences/programs-offered/' },
+    { title: 'Bio-Engineering', items: ['B.Tech.', 'Integrated M.Tech', 'MSc. (Industrial Biotechnology)', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-technology/mit-school-of-bio-engineering-sciences-and-research/programs-offered/' },
+    { title: 'Education & Research', items: ['Bachelor of Education', 'Master of Art', 'M.SC. e-Learning', 'PhD Programs'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-humanities-and-social-sciences/mit-school-of-education-research/programs-offered' },
+    { title: 'Film & Television', items: ['B. Sc. (Film Making)', 'M. Sc. (Film Making)', 'B.A. in Dramatics', 'Direction & Screenplay Writing'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-school-of-film-and-theatre/programs-offered/' },
+    { title: 'Fine Arts & Applied Arts', items: ['BFA (Applied Arts)', 'MFA (Painting)', 'MFA (Sculpture)', 'MFA (Art Therapy)', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-school-of-fine-art-applied-art/programs-offered/' },
+    { title: 'Food Technology', items: ['B. Tech.', 'M. Tech.', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-technology/mit-college-of-food-technology/programs-offered/' },
+    { title: 'Performing Arts', items: ['BPA - Dance/Vocal/Instrumental', 'MPA - Dance/Vocal/Instrumental'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-vishwashanti-sangeet-kala-academy/programs-offered/' },
+    { title: 'Marine Engineering', items: ['B.Tech.', 'B.Sc. Nautical Science'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-maritime-studies/maharashtra-academy-of-naval-education-training/programs-offered/' },
+    { title: 'Law', items: ['BBA LL.B.', 'LL.B.', 'LL.M.', 'PG certificate programme', 'Ph.D. in Law Program'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-law/MIT-School-of-Law/programs-offered/' },
+    { title: 'Humanities', items: ['B.A. (Hons.) English', 'PhD in English'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-humanities-and-social-sciences/mit-school-of-humanities/programs-offered/' },
+    { title: 'Journalism', items: ['B.A. (Journalism & Mass Comm.)', 'M.A. (Journalism & Mass Comm.)', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-international-school-of-broadcasting-and-journalism/programs-offered/' },
+  ];
+
+  const alumniCards = [
+    {
+      name: 'Aishwarya Vaidya',
+      text: 'The university helped me discover my own potential and gave me the confidence to pursue ambitious goals.',
+    },
+    {
+      name: 'Manish Poojari',
+      text: 'Staying connected with the university and its alumni community continues to open valuable opportunities.',
+    },
+    {
+      name: 'Saurabh Bharam',
+      text: 'The campus environment, faculty guidance, and opportunities for growth shaped my overall development.',
+    },
+    {
+      name: 'Sharvari Deshpande',
+      text: 'The alumni network creates a space for collaboration, shared learning, and meaningful contribution back to campus.',
+    },
+  ];
+
+  const researchCards = [
+    {
+      title: 'Research, Innovation & Entrepreneurship',
+      text: 'A strong ecosystem for intellectual property, industry collaboration, and student-led innovation projects.',
+    },
+    {
+      title: 'Academic-Industry Interface',
+      text: 'Research and development are aligned with real-world needs, enabling practical outcomes and useful technologies.',
+    },
+    {
+      title: 'AIC-MIT-ADT Incubator Forum',
+      text: 'An incubator-led environment that encourages entrepreneurship, design thinking, and new venture development.',
+    },
+    {
+      title: 'Research Metrics',
+      text: 'The ecosystem includes hundreds of copyrights, patents, designs, and research projects across disciplines.',
+    },
+  ];
+
+  const campusHighlights = [
+    'Healthcare Facility',
+    'Sports Complex',
+    'Hostel & Accommodation',
+    'Cafeteria & Mess',
+    'Transport Facility',
+    'Auditoriums & Seminar Halls',
+    'Girls Hostel',
+    'RK Memorial',
+  ];
+
+  const awards = ['ARIIA Excellence', '5 Star Rating', 'Best University Campus', 'Top Private University'];
+
+  return (
+    <div className="bg-white">
+      <section className="max-w-7xl mx-auto px-6 pt-8 pb-10">
+        <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-6 items-stretch">
+          <div className="relative overflow-hidden rounded-[30px] min-h-[560px] bg-linear-to-br from-mit-purple via-mit-purple/95 to-mit-orange shadow-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1600"
+              alt="MIT ADT University campus"
+              className="absolute inset-0 h-full w-full object-cover opacity-20"
+              referrerPolicy="no-referrer"
+            />
+            <div className="relative z-10 h-full p-8 md:p-12 text-white flex flex-col justify-between">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.35em]">
+                  New
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.28em] text-white/75">MIT-ADT University</span>
+              </div>
+
+              <div className="space-y-7 max-w-3xl">
+                <div className="space-y-3">
+                  <p className="text-sm uppercase tracking-[0.35em] text-white/70">The New Age University for</p>
+                  <h1 className="text-4xl md:text-6xl font-black leading-tight">Innovation &amp; Entrepreneurship</h1>
+                  <p className="text-base md:text-lg text-white/85 max-w-2xl leading-relaxed">
+                    A campus experience shaped around innovation, creativity, industry relevance, and holistic growth.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {heroPanels.map((panel, index) => (
+                    <div key={index} className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+                      <p className="text-[11px] uppercase tracking-[0.25em] text-white/65">{panel.eyebrow}</p>
+                      <h2 className="mt-2 text-xl font-bold">{panel.title}</h2>
+                      <p className="mt-2 text-sm text-white/80 leading-relaxed">{panel.text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <a href="https://www.mituniversity.ac.in/about-us" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-mit-purple shadow-lg transition hover:brightness-95">
+                    View More
+                    <ChevronRight className="h-4 w-4" />
+                  </a>
+                  <button onClick={() => onNavigate('admin')} className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-white/20">
+                    Staff Portal
+                  </button>
+                  <button onClick={() => onNavigate('submission')} className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-black uppercase tracking-widest text-white transition hover:bg-white/10">
+                    Flag Submission
+                  </button>
+                </div>
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-3">{f.title}</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">{f.desc}</p>
           </div>
-        ))}
+
+          <div className="space-y-4">
+            <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.3em] text-mit-purple mb-3">
+                <span>Official Links</span>
+                <span>MIT ADT</span>
+              </div>
+              <div className="space-y-2">
+                {highlightCards.map((card) => (
+                  <a key={card.label} href="#" className={`block rounded-2xl bg-gradient-to-r ${card.color} px-5 py-4 text-white shadow-sm transition hover:brightness-105`}>
+                    <div className="text-[10px] font-black uppercase tracking-[0.35em] opacity-80">{card.label}</div>
+                    <div className="mt-1 text-sm font-semibold leading-relaxed">{card.value}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.25em] text-slate-700">
+                <span className="h-2 w-2 rounded-full bg-mit-orange" />
+                News &amp; Events
+              </div>
+              <div className="mt-4 space-y-3">
+                {newsCards.slice(0, 3).map((item, index) => (
+                  <div key={index} className="rounded-xl bg-white p-4 border border-slate-200">
+                    <p className="text-sm font-semibold text-slate-800 leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.25em] text-slate-700">
+                <span className="h-2 w-2 rounded-full bg-mit-green" />
+                Quick Snapshot
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                {statCards.map((stat) => (
+                  <div key={stat.label} className="rounded-2xl bg-slate-50 p-4 text-center border border-slate-200">
+                    <div className="text-2xl font-black text-mit-purple">{stat.value}</div>
+                    <div className="mt-1 text-[11px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-white">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex flex-wrap items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-slate-600">
+            {['Latest News', 'Important Announcement', 'Publications', 'Exam Announcement'].map((tab, index) => (
+              <span key={tab} className={`rounded-full px-4 py-2 ${index === 0 ? 'bg-mit-purple text-white' : 'bg-slate-100'}`}>
+                {tab}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Why MIT Art, Design &amp; Technology University Pune India?</p>
+            <h2 className="mt-3 text-3xl md:text-4xl font-black text-slate-900">A New Generation University for innovators, business leaders, scientists, social transformers, and nation builders.</h2>
+            <p className="mt-5 text-base leading-8 text-slate-600">
+              The university follows a holistic approach to education, encouraging academic depth, discipline, communication, physical fitness, meditation, and creative participation across campus life.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              'Ranked in the Band Excellent for innovation and entrepreneurship',
+              'Awarded for a lush green, carbon-neutral campus with sustainability initiatives',
+              'Granted Atal Incubation Centre recognition under NITI Aayog',
+              'Recognized among top private universities in engineering category',
+              'World-class curriculum with project-based learning',
+              'CRIEYA innovation and product development ecosystem',
+            ].map((item, index) => (
+              <div key={index} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1 h-3 w-3 rounded-full bg-mit-orange" />
+                  <p className="text-sm font-medium leading-relaxed text-slate-700">{item}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-50 py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between gap-4 flex-wrap mb-8">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Programs Offered</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-900">Academic pathways across multiple disciplines</h2>
+            </div>
+            <button onClick={() => onNavigate('academics')} className="inline-flex items-center gap-2 rounded-full border border-mit-purple px-5 py-2.5 text-sm font-bold text-mit-purple transition hover:bg-mit-purple hover:text-white">
+              Explore Academics
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {programCards.map((program) => (
+              <div key={program.title} className="rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="text-[11px] font-black uppercase tracking-[0.3em] text-mit-purple">{program.title}</div>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  {program.items.map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-mit-orange" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <a href={program.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-700 transition hover:border-mit-purple hover:text-mit-purple">
+                    Check Eligibility
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                  <a href="https://mituniversity.ac.in/2026/Apply_Now" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-mit-orange px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition hover:brightness-110">
+                    Apply Now
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] items-start">
+          <div className="rounded-[28px] bg-linear-to-br from-mit-purple to-mit-orange p-8 text-white shadow-xl">
+            <p className="text-[11px] font-black uppercase tracking-[0.35em] text-white/75">Impeccable Placements</p>
+            <h2 className="mt-3 text-3xl font-black">A strong focus on career readiness and industry-aligned learning.</h2>
+            <p className="mt-4 text-sm leading-7 text-white/85">
+              The corporate relations and placements cell supports internships, recruitment drives, and professional development opportunities for students across schools.
+            </p>
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              {[
+                { value: '+', label: 'Job Offers' },
+                { value: '+ LPA', label: 'Highest Package' },
+                { value: '+', label: 'Internship Offers' },
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl bg-white/10 p-4 text-center backdrop-blur-sm">
+                  <div className="text-2xl font-black">{item.value}</div>
+                  <div className="mt-1 text-[11px] font-bold uppercase tracking-widest text-white/80">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {alumniCards.map((item) => (
+              <div key={item.name} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-[11px] font-black uppercase tracking-[0.3em] text-mit-purple">Alumni Speaks</div>
+                <h3 className="mt-3 text-lg font-bold text-slate-900">{item.name}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-600">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-50 py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1fr] items-start">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Research, Innovation &amp; Entrepreneurship</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-900">Built for research orientation, patents, incubation, and product development.</h2>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {researchCards.map((item) => (
+                <div key={item.title} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="text-lg font-bold text-slate-900">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-start">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+            <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Campus Life</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-900">A campus beyond books, with culture, discipline, creativity, and community.</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Students experience clubs, committees, sports, festivals, healthcare, transport, and modern student facilities throughout the year.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {campusHighlights.map((item) => (
+                <div key={item} className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-700 border border-slate-200">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-[28px] bg-linear-to-br from-mit-purple to-mit-orange p-8 text-white shadow-xl">
+              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-white/70">Awards</p>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                {awards.map((item) => (
+                  <div key={item} className="rounded-2xl bg-white/10 p-4 text-sm font-bold uppercase tracking-widest text-white/90 backdrop-blur-sm">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Enquire Now</p>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                Connect with admissions, academics, or student support to explore programs and campus opportunities.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button onClick={() => onNavigate('about')} className="rounded-full bg-mit-purple px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110">
+                  About Us
+                </button>
+                <button onClick={() => onNavigate('academics')} className="rounded-full border border-mit-orange px-5 py-2.5 text-sm font-bold text-mit-orange transition hover:bg-mit-orange/5">
+                  Academics
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 bg-slate-950 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-14 grid gap-8 lg:grid-cols-4">
+          <div>
+            <h3 className="text-lg font-black uppercase tracking-[0.25em] text-white">About Us</h3>
+            <ul className="mt-4 space-y-3 text-sm text-white/75">
+              {['Leadership', 'Governance', 'Accreditations', 'Mandatory Disclosures', 'History', 'Contact Us'].map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-black uppercase tracking-[0.25em] text-white">Academics</h3>
+            <ul className="mt-4 space-y-3 text-sm text-white/75">
+              {['Engineering', 'Design', 'Management', 'Architecture', 'Humanities', 'Law'].map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-black uppercase tracking-[0.25em] text-white">Quick Links</h3>
+            <ul className="mt-4 space-y-3 text-sm text-white/75">
+              {['Admissions', 'Placement', 'Research', 'Life @ Campus', 'News', 'Alumni'].map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-black uppercase tracking-[0.25em] text-white">Our Initiatives</h3>
+            <ul className="mt-4 space-y-3 text-sm text-white/75">
+              {['Atal Incubation Centre', 'Persona Fest', 'Convocation', 'Vishwanath Sports Meet', 'MIT Vishwajyoti International School'].map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <div className="mt-6 flex gap-3">
+              <a href="https://www.facebook.com/mitadtuniversity" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">f</a>
+              <a href="https://www.instagram.com/accounts/login/?next=/mitadtuniversity/" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">i</a>
+              <a href="https://www.linkedin.com/school/mit-art-design-&-technology-university/" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">in</a>
+              <a href="https://twitter.com/mitadtpune" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">x</a>
+              <a href="https://www.youtube.com/c/MITADTUniversityPune" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">yt</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3">
+        <a href="https://mituniversity.ac.in/#enquire_now" target="_blank" rel="noreferrer" className="rounded-full bg-mit-purple px-5 py-3 text-sm font-black uppercase tracking-widest text-white shadow-xl transition hover:brightness-110">
+          Enquire Now
+        </a>
+        <a href="https://mituniversity.ac.in/apply-now/" target="_blank" rel="noreferrer" className="rounded-full bg-mit-orange px-5 py-3 text-sm font-black uppercase tracking-widest text-white shadow-xl transition hover:brightness-110">
+          Apply Now
+        </a>
       </div>
     </div>
   );
@@ -747,176 +1175,49 @@ const AcademicsPage = () => {
   );
 };
 
-const AdminPanel = () => {
-  const [url, setUrl] = useState('');
-  const [response, setResponse] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [systemStatus, setSystemStatus] = useState<any>(null);
-
-  useEffect(() => {
-    fetch('/api/status')
-      .then(res => res.json())
-      .then(data => setSystemStatus(data))
-      .catch(() => {});
-  }, []);
-
-  const handleFetch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-
-    try {
-      const res = await fetch('/api/fetch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
-      
-      const data = await res.text();
-      setResponse(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="p-8 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-      <div className="card">
-        <div className="card-title">
-          <Terminal className="w-4 h-4 text-mit-purple" />
-          Resource Status Fetcher
-        </div>
-        <p className="text-[13px] text-text-muted mb-6 leading-relaxed">
-          Enter a remote URL to test server-side connectivity and fetch system metadata. This utility is restricted to authorized university administrators.
-        </p>
-
-        <form onSubmit={handleFetch} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label className="label">Target Resource URL</label>
-            <input 
-              type="text" 
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="http://status.adt-university.internal/health-check"
-              className="input"
-            />
-          </div>
-
-          <button 
-            type="submit"
-            disabled={loading}
-            className="btn self-start"
-          >
-            {loading ? 'Fetching...' : 'Fetch Status'}
-          </button>
-        </form>
-
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-md flex items-start gap-3">
-            <AlertCircle className="text-red-500 w-4 h-4 shrink-0 mt-0.5" />
-            <div className="text-xs text-red-600 font-medium">{error}</div>
-          </div>
-        )}
-
-        {response && (
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-2">
-              <label className="label">Server Response</label>
-              <div className="text-[10px] font-bold text-green-600 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                SUCCESS
-              </div>
-            </div>
-            <div className="bg-slate-50 border border-border rounded-md p-4 font-mono text-[12px] text-text-muted whitespace-pre-wrap overflow-x-auto max-h-[400px]">
-              <div dangerouslySetInnerHTML={{ __html: response }} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <div className="card">
-          <div className="card-title">
-            <Server className="w-4 h-4 text-mit-purple" />
-            Server Infrastructure
-          </div>
-          <div className="flex flex-col">
-            {[
-              { label: 'Database Cluster', status: 'Online' },
-              { label: 'User Auth Service', status: 'Online' },
-              { label: 'CDN Node (US-East)', status: 'Online' },
-              { label: 'Backup Storage', status: 'Syncing', badge: true },
-            ].map((item, i) => (
-              <div key={i} className="flex justify-between py-3 border-b border-border last:border-0 text-[13px]">
-                <span>{item.label}</span>
-                <span className="flex items-center gap-2">
-                  {item.badge ? (
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[11px] font-semibold">{item.status}</span>
-                  ) : (
-                    <>
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      {item.status}
-                    </>
-                  )}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-title">
-            <Activity className="w-4 h-4 text-mit-purple" />
-            Quick Actions
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {['Clear Cache', 'Rotate Keys', 'Export Data', 'Halt System'].map((action) => (
-              <button 
-                key={action}
-                className={`p-3 border border-border rounded-md text-[11px] font-medium text-center hover:bg-slate-50 transition-colors ${action === 'Halt System' ? 'text-red-600' : ''}`}
-              >
-                {action}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="card bg-mit-purple text-white border-none shadow-lg">
-          <div className="card-title text-white">
-            <Shield className="w-4 h-4 text-mit-orange" />
-            Lab Instructions
-          </div>
-          <ul className="space-y-3 text-[11px] opacity-90 leading-relaxed">
-            <li className="flex gap-2">
-              <span className="font-bold text-mit-orange">01.</span>
-              <span>Identify the SSRF vulnerability in the resource fetcher.</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="font-bold text-mit-orange">02.</span>
-              <span>Attempt to access internal services (e.g., localhost).</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="font-bold text-mit-orange">03.</span>
-              <span>Find the hidden admin panel and extract the flag.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-};
+// AdminPanel has been moved to src/AdminPanel.tsx
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('landing');
   const [solved, setSolved] = useState<SolvedState>({
     ssrf: false,
     robots: false,
-    'hidden-api': false
+    'hidden-api': false,
+    'student-delete': false
   });
+
+  useEffect(() => {
+    const handleLocation = () => {
+      const path = window.location.pathname;
+      if (path === '/admin') {
+        setCurrentPage('admin');
+      } else if (path === '/submission') {
+        setCurrentPage('submission');
+      } else if (path === '/about') {
+        setCurrentPage('about');
+      } else if (path === '/academics') {
+        setCurrentPage('academics');
+      } else if (path === '/diagnostic') {
+        setCurrentPage('diagnostic');
+      } else {
+        setCurrentPage('landing');
+      }
+    };
+
+    // Initial check
+    handleLocation();
+
+    // Listen for back/forward buttons
+    window.addEventListener('popstate', handleLocation);
+    return () => window.removeEventListener('popstate', handleLocation);
+  }, []);
+
+  const navigate = (page: Page) => {
+    setCurrentPage(page);
+    const path = page === 'landing' ? '/' : `/${page}`;
+    window.history.pushState({}, '', path);
+  };
+
 
   const handleSolve = (vuln: keyof SolvedState) => {
     setSolved(prev => ({ ...prev, [vuln]: true }));
@@ -926,74 +1227,27 @@ export default function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <Header onNavigate={setCurrentPage} currentPage={currentPage} />
+      <Header onNavigate={navigate} currentPage={currentPage} />
       
-      <div className="flex grow mt-[160px] h-[calc(100vh-300px)] overflow-hidden">
-        <Sidebar onNavigate={setCurrentPage} currentPage={currentPage} />
+      <div className="flex grow mt-[160px] h-[calc(100vh-160px)] overflow-hidden">
+        <Sidebar onNavigate={navigate} currentPage={currentPage} />
         
         <main className="grow overflow-y-auto bg-bg">
-          <AnimatePresence mode="wait">
             {isAllSolved ? (
-              <motion.div
-                key="congrats"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <Congratulations />
-              </motion.div>
+              <Congratulations />
             ) : currentPage === 'landing' ? (
-              <motion.div
-                key="landing"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <LandingPage onNavigate={setCurrentPage} />
-              </motion.div>
+              <LandingPage onNavigate={navigate} />
             ) : currentPage === 'about' ? (
-              <motion.div
-                key="about"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <AboutPage />
-              </motion.div>
+              <AboutPage />
             ) : currentPage === 'academics' ? (
-              <motion.div
-                key="academics"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <AcademicsPage />
-              </motion.div>
+              <AcademicsPage />
+            ) : currentPage === 'diagnostic' ? (
+              <PublicDiagnosticTool />
             ) : currentPage === 'admin' ? (
-              <motion.div
-                key="admin"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <AdminPanel />
-              </motion.div>
+              <AdminPanel onDeleteAttempt={() => {}} />
             ) : (
-              <motion.div
-                key="submission"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <SubmissionPanel solved={solved} onSolve={handleSolve} />
-              </motion.div>
+              <SubmissionPanel solved={solved} onSolve={handleSolve} />
             )}
-          </AnimatePresence>
         </main>
       </div>
     </div>
