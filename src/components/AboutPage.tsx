@@ -1,6 +1,7 @@
 import React from 'react';
 import { Globe, Award, Target, BookOpen } from 'lucide-react';
 import { motion } from 'motion/react';
+import campusPhoto from '../../images/it_building.jpg';
 
 const AboutPage: React.FC = () => {
   return (
@@ -13,11 +14,13 @@ const AboutPage: React.FC = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div className="rounded-[40px] overflow-hidden shadow-2xl">
+        <div className="rounded-[40px] overflow-hidden shadow-2xl bg-slate-100 aspect-[4/3]">
           <img 
-            src="../images/it_building.jpg" 
+            src={campusPhoto}
             alt="University Campus" 
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <div className="space-y-8">

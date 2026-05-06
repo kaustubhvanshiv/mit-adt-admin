@@ -278,9 +278,11 @@ const AdminPanel = ({ onDeleteAttempt }: AdminPanelProps) => {
                         <td className="px-8 py-4">
                           <button 
                             onClick={() => handleDelete(student.id, student.name)}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                            aria-label={`Delete ${student.name}`}
+                            className="inline-flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-bold uppercase tracking-widest text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
                           >
                             <Trash2 className="w-4 h-4" />
+                            Delete
                           </button>
                         </td>
                       </tr>

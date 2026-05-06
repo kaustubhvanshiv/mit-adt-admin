@@ -3,22 +3,17 @@ User-agent: *
 Allow: /
 
 # Restricted areas - Confidential
-Disallow: /admin
 Disallow: /admin-backup
 Disallow: /administrator
-Disallow: /backend
-Disallow: /management
+Disallow: /admin
 Disallow: /sys-admin
 Disallow: /internal-portal
-Disallow: /dev-debug
+Disallow: /management
 Disallow: /api/internal/config
-Disallow: /api/v1/debug
-Disallow: /server-status
 Disallow: /logs
 Disallow: /temp-storage
 Disallow: /backup-files
 Disallow: /private-records
-Disallow: /root-console
 
 # Sitemaps
 Sitemap: https://mituniversity.ac.in/sitemap.xml
