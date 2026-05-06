@@ -5,36 +5,36 @@ import { motion } from 'motion/react';
 const StaffPage: React.FC = () => {
   const staff = [
     {
-      name: 'Dr. Vikram Sarabhai',
-      role: 'Dean - School of Engineering',
-      dept: 'Engineering & Sciences',
-      email: 'vikram.s@mituniversity.edu.in',
+      name: 'Dr. Ganesh Pathak',
+      role: 'Dean - School of Computing',
+      dept: 'Computer Engineering & IT',
+      email: 'ganeshp.s@mituniversity.edu.in',
       phone: '+91 20 1234 5678',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram'
+      img: new URL('../../images/dean.png', import.meta.url).href
     },
     {
-      name: 'Prof. Anjali Sharma',
+      name: 'Dr. Prashant Dhotre',
       role: 'Head of Department',
-      dept: 'Design Thinking',
-      email: 'anjali.sharma@mituniversity.edu.in',
+      dept: 'Information Technology',
+      email: 'prashant.dhotre@mituniversity.edu.in',
       phone: '+91 20 1234 5679',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anjali'
+      img: new URL('../../images/prashant_dhotre.png', import.meta.url).href
     },
     {
-      name: 'Dr. Rajesh Khanna',
+      name: 'Dr. Ishwari Raskar',
       role: 'Professor',
-      dept: 'Vedic Science',
-      email: 'r.khanna@mituniversity.edu.in',
+      dept: 'Information Technology',
+      email: 'ishwari.raskar@mituniversity.edu.in',
       phone: '+91 20 1234 5680',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh'
+      img: new URL('../../images/iswari_raskar.png', import.meta.url).href
     },
     {
-      name: 'Ms. Priya Deshmukh',
-      role: 'Assistant Professor',
-      dept: 'Computer Science',
-      email: 'priya.d@mituniversity.edu.in',
+      name: 'Prof. Rahul Bhole',
+      role: 'Professor',
+      dept: 'Information Technology',
+      email: 'rahul.bhole@mituniversity.edu.in',
       phone: '+91 20 1234 5681',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
+      img: new URL('../../images/rahul_bhole.png', import.meta.url).href
     },
     {
       name: 'Mr. Sunil Gavaskar',
@@ -42,7 +42,7 @@ const StaffPage: React.FC = () => {
       dept: 'Physical Education',
       email: 'sunil.g@mituniversity.edu.in',
       phone: '+91 20 1234 5682',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sunil'
+      img: new URL('../../images/sunil_g.png', import.meta.url).href
     },
     {
       name: 'Dr. Meena Kumari',
@@ -50,7 +50,7 @@ const StaffPage: React.FC = () => {
       dept: 'Research & Innovation',
       email: 'meena.k@mituniversity.edu.in',
       phone: '+91 20 1234 5683',
-      img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Meena'
+      img: new URL('../../images/meena.png', import.meta.url).href
     }
   ];
 

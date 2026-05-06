@@ -15,7 +15,7 @@ const AboutPage: React.FC = () => {
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="rounded-[40px] overflow-hidden shadow-2xl">
           <img 
-            src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1600" 
+            src="../images/it_building.jpg" 
             alt="University Campus" 
             className="w-full h-full object-cover"
           />

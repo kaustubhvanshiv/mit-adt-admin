@@ -416,9 +416,9 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
   ];
 
   const statCards = [
-    { value: '+', label: 'Startups Incubated' },
-    { value: '+ Cr', label: 'External Funding' },
-    { value: '+', label: 'Publications' },
+    { value: '37+', label: 'Startups Incubated' },
+    { value: '2.7+ Cr', label: 'External Funding' },
+    { value: '1313+', label: 'Publications' },
   ];
 
   const newsCards = [
@@ -586,11 +586,11 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
                 <span className="h-2 w-2 rounded-full bg-mit-green" />
                 Quick Snapshot
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-[1fr_1fr_1.25fr] gap-3">
                 {statCards.map((stat) => (
-                  <div key={stat.label} className="rounded-2xl bg-slate-50 p-4 text-center border border-slate-200">
-                    <div className="text-2xl font-black text-mit-purple">{stat.value}</div>
-                    <div className="mt-1 text-[11px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</div>
+                  <div key={stat.label} className="rounded-2xl bg-slate-50 p-4 min-h-[128px] text-center border border-slate-200 flex flex-col items-center justify-center">
+                    <div className="text-xl sm:text-2xl font-black text-mit-purple leading-none whitespace-nowrap">{stat.value}</div>
+                    <div className="mt-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] leading-snug text-slate-500">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -689,11 +689,12 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
             <p className="mt-4 text-sm leading-7 text-white/85">
               The corporate relations and placements cell supports internships, recruitment drives, and professional development opportunities for students across schools.
             </p>
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="mt-6 grid grid-cols-2 gap-3">
               {[
-                { value: '+', label: 'Job Offers' },
-                { value: '+ LPA', label: 'Highest Package' },
-                { value: '+', label: 'Internship Offers' },
+                { value: '1200+', label: 'Job Offers' },
+                { value: '61+ LPA', label: 'Highest Package' },
+                { value: '600+', label: 'Internship Offers' },
+                { value: '500+', label: 'Major Recruiters' },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl bg-white/10 p-4 text-center backdrop-blur-sm">
                   <div className="text-2xl font-black">{item.value}</div>
