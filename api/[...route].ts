@@ -23,6 +23,8 @@ const hiddenApiFlag = generateFlag("hidden-api", "api");
 const deleteFlag = "FLAG{ssrf-delete-user-9921}";
 activeFlags["ssrf-delete"] = deleteFlag;
 
+const ADMIN_DELETE_KEY = "ADMIN_SECURE_TOKEN_2026_X92";
+
 function sendJson(res: any, status: number, payload: unknown): void {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json");
@@ -33,6 +35,12 @@ function sendText(res: any, status: number, text: string, contentType: string = 
   res.statusCode = status;
   res.setHeader("Content-Type", contentType);
   res.end(text);
+}
+
+function sendRedirect(res: any, location: string): void {
+  res.statusCode = 302;
+  res.setHeader("Location", location);
+  res.end();
 }
 
 async function readJsonBody(req: any): Promise<any> {
@@ -124,12 +132,12 @@ export default async function handler(req: any, res: any): Promise<void> {
             <tr>
               <td style="padding: 10px; font-size: 14px;">alice</td>
               <td style="padding: 10px; font-size: 14px;">Student</td>
-              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=alice" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
+              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=alice&key=${ADMIN_DELETE_KEY}" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
             </tr>
             <tr>
               <td style="padding: 10px; font-size: 14px;">carlos</td>
               <td style="padding: 10px; font-size: 14px;">Staff</td>
-              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=carlos" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
+              <td style="padding: 10px;"><a href="/api/internal/admin-panel/delete?username=carlos&key=${ADMIN_DELETE_KEY}" style="color: #ef4444; text-decoration: none; font-weight: bold;">Delete</a></td>
             </tr>
           </table>
         </div>
@@ -137,6 +145,9 @@ export default async function handler(req: any, res: any): Promise<void> {
         <div style="margin-top: 20px; padding: 15px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 6px;">
           <p style="color: #9a3412; font-size: 13px; margin: 0;">
             <strong>System Flag:</strong> ${ssrfFlag}
+          </p>
+          <p style="color: #94a3b8; font-size: 11px; margin-top: 10px;">
+            Hidden Admin Key: <span style="color: #e2e8f0;">${ADMIN_DELETE_KEY}</span> (Required for deletion actions)
           </p>
         </div>
       </div>
@@ -150,6 +161,12 @@ export default async function handler(req: any, res: any): Promise<void> {
   if (route === "internal/admin-panel/delete" && method === "GET") {
     if (!isInternal) {
       sendText(res, 403, "Access Denied: Deletion requires internal system clearance.", "text/plain");
+      return;
+    }
+
+    const key = url.searchParams.get("key");
+    if (key !== ADMIN_DELETE_KEY) {
+      sendText(res, 403, "Access Denied: Invalid Administrative Key. Action blocked.", "text/plain");
       return;
     }
 
@@ -177,9 +194,15 @@ export default async function handler(req: any, res: any): Promise<void> {
   }
 
   // --- VULNERABLE SSRF PROXY ---
-  if (route === "fetch" && method === "POST") {
-    const body = await readJsonBody(req);
-    let fetchUrl = body?.url;
+  if (route === "fetch" && (method === "POST" || method === "GET")) {
+    let fetchUrl = "";
+    
+    if (method === "POST") {
+      const body = await readJsonBody(req);
+      fetchUrl = body?.url;
+    } else {
+      fetchUrl = url.searchParams.get("url") || "";
+    }
 
     if (!fetchUrl) {
       sendJson(res, 400, { error: "URL is required" });
@@ -188,8 +211,16 @@ export default async function handler(req: any, res: any): Promise<void> {
 
     try {
       // Simulation for Vercel: If the URL is localhost, we simulate the internal fetch
-      if (fetchUrl.includes("localhost") || fetchUrl.includes("127.0.0.1")) {
-        const internalUrl = new URL(fetchUrl);
+      if (fetchUrl.includes("localhost") || fetchUrl.includes("127.0.0.1") || fetchUrl.includes("internal")) {
+        // If it's a direct browser access to the API with a localhost query, 
+        // and it's not already an internal request, we might want to redirect
+        // as per user's request: "it will Redicret to page with Delete api hidden key"
+        if (method === "GET" && !req.headers["x-internal-request"]) {
+          // This allows users to paste the fetch URL in their browser and see the "result"
+          // We'll simulate this by just processing it and returning HTML if possible.
+        }
+
+        const internalUrl = new URL(fetchUrl.startsWith("http") ? fetchUrl : `http://localhost${fetchUrl.startsWith("/") ? "" : "/"}${fetchUrl}`);
         const internalPath = internalUrl.pathname + internalUrl.search;
         
         // We "recurse" into our own handler with a special internal header
@@ -200,20 +231,26 @@ export default async function handler(req: any, res: any): Promise<void> {
         };
         
         let output = "";
+        let contentType = "text/plain";
         const mockRes = {
           statusCode: 200,
-          setHeader: () => {},
+          setHeader: (name: string, value: string) => { 
+            if (name.toLowerCase() === "content-type") contentType = value;
+          },
           end: (data: string) => { output = data; }
         };
         
         await handler(mockReq, mockRes);
-        sendText(res, 200, output, "text/plain");
+        
+        // If the output is HTML, we should send it as HTML so it renders in the browser/Repeater
+        sendText(res, 200, output, contentType);
         return;
       }
 
       const response = await fetch(fetchUrl);
       const data = await response.text();
-      sendText(res, 200, data, "text/plain");
+      const contentType = response.headers.get("Content-Type") || "text/plain";
+      sendText(res, 200, data, contentType);
     } catch (error: any) {
       sendJson(res, 500, { error: "Failed to fetch URL", details: error?.message || "Unknown error" });
     }
