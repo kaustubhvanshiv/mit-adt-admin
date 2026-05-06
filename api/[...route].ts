@@ -201,12 +201,6 @@ export default async function handler(req: any, res: any): Promise<void> {
       environment: "production-internal",
       version: "1.0.4-internal",
       db_host: "db.adt-university.internal",
-      internal_flag: hiddenApiFlag,
-      endpoints: {
-        status: "/api/status",
-        config: "/api/internal/config",
-        admin: "/api/internal/admin-panel"
-      },
       note: "Debug mode is available via ?debug=true for internal systems."
     });
     return;
