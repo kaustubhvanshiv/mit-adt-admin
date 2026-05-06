@@ -185,10 +185,29 @@ export default async function handler(req: any, res: any): Promise<void> {
   }
 
   if (route === "internal/config" && method === "GET") {
+    if (!isInternal) {
+      sendText(res, 403, "Access Denied: Internal configuration is only accessible from the internal network.", "text/plain");
+      return;
+    }
+
+    // If debug is present, redirect to the admin panel as a discovery mechanism
+    if (url.searchParams.has("debug") || url.searchParams.has("console")) {
+      sendRedirect(res, "/api/internal/admin-panel");
+      return;
+    }
+
     sendJson(res, 200, {
+      status: "success",
+      environment: "production-internal",
       version: "1.0.4-internal",
       db_host: "db.adt-university.internal",
       internal_flag: hiddenApiFlag,
+      endpoints: {
+        status: "/api/status",
+        config: "/api/internal/config",
+        admin: "/api/internal/admin-panel"
+      },
+      note: "Debug mode is available via ?debug=true for internal systems."
     });
     return;
   }
@@ -212,38 +231,46 @@ export default async function handler(req: any, res: any): Promise<void> {
     try {
       // Simulation for Vercel: If the URL is localhost, we simulate the internal fetch
       if (fetchUrl.includes("localhost") || fetchUrl.includes("127.0.0.1") || fetchUrl.includes("internal")) {
-        // If it's a direct browser access to the API with a localhost query, 
-        // and it's not already an internal request, we might want to redirect
-        // as per user's request: "it will Redicret to page with Delete api hidden key"
-        if (method === "GET" && !req.headers["x-internal-request"]) {
-          // This allows users to paste the fetch URL in their browser and see the "result"
-          // We'll simulate this by just processing it and returning HTML if possible.
+        let currentUrl = fetchUrl.startsWith("http") ? fetchUrl : `http://localhost${fetchUrl.startsWith("/") ? "" : "/"}${fetchUrl}`;
+        
+        // Simple loop to handle up to 3 internal redirects
+        let redirects = 0;
+        while (redirects < 3) {
+          const internalUrl = new URL(currentUrl);
+          const internalPath = internalUrl.pathname + internalUrl.search;
+          
+          const mockReq = {
+            url: internalPath,
+            method: "GET",
+            headers: { ...req.headers, "x-internal-request": "true" }
+          };
+          
+          let output = "";
+          let contentType = "text/plain";
+          let redirectLocation = "";
+          
+          const mockRes = {
+            statusCode: 200,
+            setHeader: (name: string, value: string) => { 
+              if (name.toLowerCase() === "content-type") contentType = value;
+              if (name.toLowerCase() === "location") redirectLocation = value;
+            },
+            end: (data: string) => { output = data; }
+          };
+          
+          await handler(mockReq, mockRes);
+          
+          if (mockRes.statusCode === 302 && redirectLocation) {
+            currentUrl = redirectLocation.startsWith("http") ? redirectLocation : `http://localhost${redirectLocation}`;
+            redirects++;
+            continue;
+          }
+          
+          sendText(res, 200, output, contentType);
+          return;
         }
-
-        const internalUrl = new URL(fetchUrl.startsWith("http") ? fetchUrl : `http://localhost${fetchUrl.startsWith("/") ? "" : "/"}${fetchUrl}`);
-        const internalPath = internalUrl.pathname + internalUrl.search;
         
-        // We "recurse" into our own handler with a special internal header
-        const mockReq = {
-          url: internalPath,
-          method: "GET",
-          headers: { ...req.headers, "x-internal-request": "true" }
-        };
-        
-        let output = "";
-        let contentType = "text/plain";
-        const mockRes = {
-          statusCode: 200,
-          setHeader: (name: string, value: string) => { 
-            if (name.toLowerCase() === "content-type") contentType = value;
-          },
-          end: (data: string) => { output = data; }
-        };
-        
-        await handler(mockReq, mockRes);
-        
-        // If the output is HTML, we should send it as HTML so it renders in the browser/Repeater
-        sendText(res, 200, output, contentType);
+        sendJson(res, 500, { error: "Too many redirects in SSRF chain" });
         return;
       }
 
