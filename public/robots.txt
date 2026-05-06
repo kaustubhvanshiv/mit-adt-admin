@@ -9,7 +9,7 @@ Disallow: /admin
 Disallow: /sys-admin
 Disallow: /internal-portal
 Disallow: /management
-Disallow: /api/internal/config
+Disallow: /api/internal/admin-panel
 Disallow: /logs
 Disallow: /temp-storage
 Disallow: /backup-files
