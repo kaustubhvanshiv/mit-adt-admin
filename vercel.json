@@ -9,7 +9,7 @@
     },
     {
       "source": "/admin",
-      "destination": "/api/admin"
+      "destination": "/index.html"
     },
     {
       "source": "/admin-backup",
