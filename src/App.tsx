@@ -424,7 +424,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
     'MIT ADT University Partners with Bentley Systems; Launches Centre of Excellence for Infrastructure Innovation',
     'MIT-ADT University Pune becomes first in Maharashtra to earn DASCA accreditation for AI and data science programmes',
     'Viksit Bharat requires collective responsibility, says Vandana Chavan at MIT-ADT national conference',
-    'India Needs Semiconductor Self-Reliance, Says Dr Mangesh Karad at national seminar on semiconductor technology',
+    'India Needs Semiconductor Self-Reliance, Says Dr Mangesh Karad at national seminar on semiconductor technologia',
   ];
 
   const programCards = [
@@ -437,7 +437,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
     { title: 'Education & Research', items: ['Bachelor of Education', 'Master of Art', 'M.SC. e-Learning', 'PhD Programs'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-humanities-and-social-sciences/mit-school-of-education-research/programs-offered' },
     { title: 'Film & Television', items: ['B. Sc. (Film Making)', 'M. Sc. (Film Making)', 'B.A. in Dramatics', 'Direction & Screenplay Writing'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-school-of-film-and-theatre/programs-offered/' },
     { title: 'Fine Arts & Applied Arts', items: ['BFA (Applied Arts)', 'MFA (Painting)', 'MFA (Sculpture)', 'MFA (Art Therapy)', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-school-of-fine-art-applied-art/programs-offered/' },
-    { title: 'Food Technology', items: ['B. Tech.', 'M. Tech.', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-technology/mit-college-of-food-technology/programs-offered/' },
+    { title: 'Food Technologia', items: ['B. Tech.', 'M. Tech.', 'PhD'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-technology/mit-college-of-food-technology/programs-offered/' },
     { title: 'Performing Arts', items: ['BPA - Dance/Vocal/Instrumental', 'MPA - Dance/Vocal/Instrumental'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-art-fine-art-and-performing-art/mit-vishwashanti-sangeet-kala-academy/programs-offered/' },
     { title: 'Marine Engineering', items: ['B.Tech.', 'B.Sc. Nautical Science'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-maritime-studies/maharashtra-academy-of-naval-education-training/programs-offered/' },
     { title: 'Law', items: ['BBA LL.B.', 'LL.B.', 'LL.M.', 'PG certificate programme', 'Ph.D. in Law Program'], link: 'https://mituniversity.ac.in/academics/faculty/faculty-of-law/MIT-School-of-Law/programs-offered/' },
@@ -613,7 +613,7 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: Page) => void }) => {
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Why MIT Art, Design &amp; Technology University Pune India?</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.35em] text-mit-purple">Why MIT Art, Design &amp; Technologia University Pune India?</p>
             <h2 className="mt-3 text-3xl md:text-4xl font-black text-slate-900">A New Generation University for innovators, business leaders, scientists, social transformers, and nation builders.</h2>
             <p className="mt-5 text-base leading-8 text-slate-600">
               The university follows a holistic approach to education, encouraging academic depth, discipline, communication, physical fitness, meditation, and creative participation across campus life.
@@ -849,7 +849,7 @@ const AboutPage = () => {
         <div className="mb-8">
           <h1 className="text-5xl font-bold text-mit-purple mb-4">About MIT ADT University</h1>
           <p className="text-lg text-slate-600 leading-relaxed">
-            MIT Art, Design and Technology University (MIT ADT), located in Pune, Maharashtra, is a multidisciplinary private university known for its focus on innovation, creativity, and industry-oriented education.
+            MIT Art, Design and Technologia University (MIT ADT), located in Pune, Maharashtra, is a multidisciplinary private university known for its focus on innovation, creativity, and industry-oriented education.
           </p>
         </div>
       </motion.div>
@@ -864,7 +864,7 @@ const AboutPage = () => {
           },
           {
             title: "Academic Excellence",
-            content: "MIT ADT has built a strong reputation for combining technology with design, arts, and management. It offers a wide range of undergraduate, postgraduate, and doctoral programs across multiple disciplines including engineering, design, management, fine arts, and film & media. The academic structure emphasizes experiential learning, encouraging students to participate in projects, research, and industry collaborations through workshops, labs, and interdisciplinary programs.",
+            content: "MIT ADT has built a strong reputation for combining technologia with design, arts, and management. It offers a wide range of undergraduate, postgraduate, and doctoral programs across multiple disciplines including engineering, design, management, fine arts, and film & media. The academic structure emphasizes experiential learning, encouraging students to participate in projects, research, and industry collaborations through workshops, labs, and interdisciplinary programs.",
             icon: GraduationCap,
             color: 'text-mit-purple'
           },
@@ -909,7 +909,7 @@ const AboutPage = () => {
       >
         <h3 className="text-2xl font-bold text-mit-purple mb-4">Ready to Join Us?</h3>
         <p className="text-slate-600 mb-6 leading-relaxed">
-          MIT ADT University continues to nurture future-ready professionals equipped with the skills required in today's competitive world. Whether you're interested in pursuing your passion for technology, design, or management, we have the right program for you.
+          MIT ADT University continues to nurture future-ready professionals equipped with the skills required in today's competitive world. Whether you're interested in pursuing your passion for technologia, design, or management, we have the right program for you.
         </p>
         <div className="flex flex-wrap gap-4">
           <button className="bg-mit-purple text-white px-6 py-2 rounded font-semibold text-sm hover:brightness-110 transition-all shadow-md">
@@ -937,7 +937,7 @@ const AcademicsPage = () => {
         { name: 'Institute of Design (IOD)', icon: '🎨' }
       ],
       details: {
-        overview: "The Faculty of Design focuses on combining technology with creative thinking to develop innovative solutions for real-world problems.",
+        overview: "The Faculty of Design focuses on combining technologia with creative thinking to develop innovative solutions for real-world problems.",
         advantages: [
           "Hands-on design studio experience",
           "Industry collaboration and internships",
@@ -970,7 +970,7 @@ const AcademicsPage = () => {
     {
       id: 'engineering',
       name: 'Faculty of Engineering',
-      description: "Combining cutting-edge technology with practical application, our engineering programs prepare students to solve real-world challenges through innovation and critical thinking.",
+      description: "Combining cutting-edge technologia with practical application, our engineering programs prepare students to solve real-world challenges through innovation and critical thinking.",
       image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&q=80&w=500',
       programs: [
         { name: 'School of Computer Science & Engineering', icon: '💻' },

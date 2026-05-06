@@ -58,7 +58,7 @@ The application will start on **http://localhost:3000**
 └── README.md               # This file
 ```
 
-## 🏗️ Technology Stack
+## 🏗️ Technologia Stack
 
 - **Frontend**: React 19, TypeScript, Tailwind CSS, Vite
 - **Backend**: Express.js, Node.js

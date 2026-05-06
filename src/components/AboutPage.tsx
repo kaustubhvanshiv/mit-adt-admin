@@ -9,7 +9,7 @@ const AboutPage: React.FC = () => {
       <div className="text-center space-y-4">
         <h1 className="text-5xl font-black text-slate-900 tracking-tight">About MIT ADT University</h1>
         <p className="text-xl text-text-muted max-w-3xl mx-auto font-medium">
-          A world-class hub of excellence dedicated to art, design, and technology.
+          A world-class hub of excellence dedicated to art, design, and technologia.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ const AboutPage: React.FC = () => {
             <span className="text-mit-purple font-black uppercase tracking-[0.3em] text-sm">Our Legacy</span>
             <h2 className="text-3xl font-black text-slate-900 leading-tight">Empowering Minds Since Inception</h2>
             <p className="text-slate-600 leading-relaxed">
-              MIT Art, Design and Technology University, Pune is established under the MIT Art, Design and Technology University Act, 2015. The university is a multi-disciplinary university which has been awarded as "The Best University Campus" at the 10th National Education Excellence Awards 2017 by ASSOCHAM.
+              MIT Art, Design and Technologia University, Pune is established under the MIT Art, Design and Technologia University Act, 2015. The university is a multi-disciplinary university which has been awarded as "The Best University Campus" at the 10th National Education Excellence Awards 2017 by ASSOCHAM.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-6">

@@ -48,7 +48,7 @@ const AcademicsPage: React.FC = () => {
       title: 'Bio-Engineering',
       icon: Microscope,
       color: 'bg-mit-cyan',
-      desc: 'Bridging the gap between biology and technology for a better tomorrow.'
+      desc: 'Bridging the gap between biology and technologia for a better tomorrow.'
     },
     {
       title: 'Maritime Studies',
