@@ -251,7 +251,6 @@ const SubmissionPanel = ({ solved, onSolve }: { solved: SolvedState, onSolve: (v
     if (vulnerability) {
       setMessage({ type: 'success', text: `✅ Correct! You solved the "${vulnerability}" challenge.` });
       onSolve(vulnerability);
-      setFlag('');
     } else {
       setMessage({ type: 'error', text: '❌ Incorrect flag. Check your exploit and try again.' });
     }
